@@ -1,4 +1,5 @@
 import '../resources/cirtificate/templates/csr_template.dart';
+import '../resources/enums.dart';
 import 'address.dart';
 
 /// Represents an EGS unit information.
@@ -42,7 +43,10 @@ class EGSUnitInfo {
     required this.location,
   });
 
-  CSRConfigProps toCsrProps(String solutionName) {
+  CSRConfigProps toCsrProps(
+    String solutionName, {
+    ZatcaEnvironment environment = ZatcaEnvironment.sandbox,
+  }) {
     return CSRConfigProps(
       egsModel: model,
       egsSerialNumber: uuid,
@@ -53,7 +57,7 @@ class EGSUnitInfo {
       branchName: branchName,
       taxpayerName: taxpayerName,
       taxpayerProvidedId: taxpayerProvidedId,
-      production: false,
+      environment: environment,
     );
   }
 }

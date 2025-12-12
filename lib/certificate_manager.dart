@@ -11,7 +11,7 @@ import 'models/compliance_certificate.dart';
 
 /// The `CertificateManager` class is a singleton that manages the generation of key pairs, CSRs, and the issuance of compliance and production certificates.
 class CertificateManager {
-  ZatcaEnvironment env = ZatcaEnvironment.development;
+  ZatcaEnvironment env = ZatcaEnvironment.sandbox;
   CertificateManager._();
 
   /// The single instance of the `CertificateManager` class.
@@ -190,11 +190,13 @@ class CertificateManager {
   }
 
   /// Issues a compliance certificate using the provided CSR and OTP.
+  /// Issues a compliance certificate using the provided CSR and OTP.
   Future<ZatcaCertificate> issueComplianceCertificate(
     String csr,
-    String otp,
-  ) async {
-    final api = API(env);
+    String otp, {
+    ZatcaEnvironment? environment,
+  }) async {
+    final api = API(environment ?? env);
     final Map<String, dynamic> response = await api
         .compliance()
         .issueCertificate(csr, otp);
@@ -203,9 +205,10 @@ class CertificateManager {
 
   /// Issues a production certificate using the provided compliance certificate.
   Future<ZatcaCertificate> issueProductionCertificate(
-    ZatcaCertificate certificate,
-  ) async {
-    final api = API(env);
+    ZatcaCertificate certificate, {
+    ZatcaEnvironment? environment,
+  }) async {
+    final api = API(environment ?? env); // ← Changed this line
     final String cleanPem = CertificateUtil.cleanCertificatePem(
       certificate.complianceCertificatePem,
     );
@@ -215,13 +218,15 @@ class CertificateManager {
     return ZatcaCertificate.fromJson(response);
   }
 
+  /// Check invoice compliance
   checkInvoiceCompliance({
     required ZatcaCertificate complianceCertificate,
     required String ublXml,
     required String invoiceHash,
     required String uuid,
+    ZatcaEnvironment? environment, // ← Add this parameter
   }) async {
-    final api = API(env);
+    final api = API(environment ?? env); // ← Changed this line
     final String cleanPem = CertificateUtil.cleanCertificatePem(
       complianceCertificate.complianceCertificatePem,
     );

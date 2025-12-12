@@ -32,8 +32,9 @@ enum InvoiceRelationType {
 
 /// This enum represents the type of environment.
 enum ZatcaEnvironment {
-  production("production"),
-  development("development");
+  sandbox("sandbox"),
+  simulation("simulation"),
+  production("production");
 
   final String value;
   const ZatcaEnvironment(this.value);

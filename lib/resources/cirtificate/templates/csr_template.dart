@@ -1,3 +1,5 @@
+import 'package:zatca/resources/enums.dart';
+
 const String template = '''
 # ------------------------------------------------------------------
 # Default section for "req" command options
@@ -20,8 +22,8 @@ req_extensions = v3_req
 [ v3_req ]
 #basicConstraints=CA:FALSE
 #keyUsage = digitalSignature, keyEncipherment
-# Production or Testing Template (TSTZATCA-Code-Signing - ZATCA-Code-Signing)
-1.3.6.1.4.1.311.20.2 = ASN1:UTF8String:SET_PRODUCTION_VALUE
+# Production or Testing Template (TSTZATCA-Code-Signing - PREZATCA-Code-Signing - ZATCA-Code-Signing)
+1.3.6.1.4.1.311.20.2 = ASN1:UTF8String:SET_ENVIRONMENT_VALUE
 subjectAltName=dirName:dir_sect
 
 [ dir_sect ]
@@ -55,7 +57,7 @@ countryName = SA
 
 class CSRConfigProps {
   final String? privateKeyPass;
-  final bool production;
+  final ZatcaEnvironment environment;
   final String egsModel;
   final String egsSerialNumber;
   final String solutionName;
@@ -68,7 +70,7 @@ class CSRConfigProps {
 
   CSRConfigProps({
     this.privateKeyPass,
-    this.production = false,
+    this.environment = ZatcaEnvironment.sandbox,
     required this.egsModel,
     required this.egsSerialNumber,
     required this.solutionName,
@@ -80,6 +82,17 @@ class CSRConfigProps {
     required this.taxpayerProvidedId,
   });
 
+  String _getAsnTemplate() {
+    switch (environment) {
+      case ZatcaEnvironment.sandbox:
+        return 'TSTZATCA-Code-Signing';
+      case ZatcaEnvironment.simulation:
+        return 'PREZATCA-Code-Signing';
+      case ZatcaEnvironment.production:
+        return 'ZATCA-Code-Signing';
+    }
+  }
+
   String toTemplate() {
     String populatedTemplate = template;
     populatedTemplate = populatedTemplate.replaceAll(
@@ -87,8 +100,8 @@ class CSRConfigProps {
       privateKeyPass ?? "SET_PRIVATE_KEY_PASS",
     );
     populatedTemplate = populatedTemplate.replaceAll(
-      "SET_PRODUCTION_VALUE",
-      production ? "ZATCA-Code-Signing" : "PREZATCA-Code-Signing",
+      "SET_ENVIRONMENT_VALUE",
+      _getAsnTemplate(),
     );
     populatedTemplate = populatedTemplate.replaceAll(
       "SET_EGS_SERIAL_NUMBER",
