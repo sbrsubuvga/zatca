@@ -10,6 +10,7 @@ import 'package:zatca/resources/cirtificate/certficate_util.dart';
 import 'package:zatca/resources/qr_generator.dart';
 import 'package:zatca/resources/signature/signature_util.dart';
 import 'package:zatca/resources/xml/xml_util.dart';
+import 'package:zatca/models/qr_data.dart'; // or wherever QrData is defined
 
 import 'models/supplier.dart';
 
@@ -63,7 +64,10 @@ class ZatcaManager {
   ///   /// [previousInvoiceHash] - The hash of the previous invoice.
 
   ///   /// Returns a `ZatcaQr` object containing the QR code and invoice data.
-  ZatcaQr generateZatcaQrInit({required BaseInvoice invoice}) {
+  ZatcaQr generateZatcaQrInit({
+    required BaseInvoice invoice,
+    required int icv,
+  }) {
     if (_supplier == null ||
         _privateKeyPem == null ||
         _certificatePem == null ||
@@ -109,9 +113,9 @@ class ZatcaManager {
     //
     // );
 
-    final invoiceXml = XmlUtil.generateZATCAXml(invoice, _supplier!);
-    final xmlString = invoiceXml.toXmlString(pretty: true, indent: '    ');
-    String hashableXml = invoiceXml.rootElement.toXmlString(
+    final xml = XmlUtil.generateZATCAXml(invoice, _supplier!, icv: icv);
+    final xmlString = xml.toXmlString(pretty: true, indent: '    ');
+    String hashableXml = xml.rootElement.toXmlString(
       pretty: true,
       indent: '    ',
     );
