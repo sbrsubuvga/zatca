@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+* Added simulation environment.
+* Bug fixes.
+
 ## 0.5.0
 
 * Added support for item discounts.

@@ -36,8 +36,84 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.5.0
+  zatca: ^0.6.0
 ```
+
+## Platform Requirements
+
+### Certificate Generation Workflow
+
+There are two ways to work with certificates in this package:
+
+#### Option 1: Using Pre-generated Certificates (No OpenSSL Required)
+
+If you already have a certificate and private key generated elsewhere, you can **skip the certificate generation step** and start directly by initializing ZATCA with your existing certificate. This is useful in the following scenarios:
+
+- **Server-generated certificates**: Certificates generated on your backend server system
+- **External system certificates**: Certificates generated using other tools or platforms (e.g., OpenSSL CLI, other certificate management systems)
+- **Pre-existing certificates**: Certificates that were generated previously and stored securely
+- **Mobile/Cloud deployment**: When deploying on mobile platforms or cloud environments where OpenSSL is not available
+
+**Usage Example:**
+
+```dart
+final zatcaManager = ZatcaManager.instance;
+zatcaManager.initializeZacta(
+  sellerName: "Your Seller Name",
+  sellerTRN: "Your TRN",
+  supplier: supplier,
+  privateKeyPem: yourExistingPrivateKeyPem,  // From server or other source
+  certificatePem: yourExistingCertificatePem,  // From server or other source
+);
+```
+
+**Benefits:**
+- ✅ **No OpenSSL required** - Works on any platform (including mobile)
+- ✅ **Flexible deployment** - Certificates can be managed separately from your Flutter app
+- ✅ **Security** - Certificates can be generated and stored securely on your server
+
+#### Option 2: Generating Certificates with This Package (OpenSSL Required)
+
+If you want to generate certificates using this package's `generateCSR` method, you need:
+
+1. **Desktop Platform**: Certificate generation is only supported on **desktop platforms** (Windows, Linux, and macOS). Mobile platforms (iOS and Android) are not supported for CSR generation.
+
+2. **OpenSSL Installation**: The `generateCSR` method requires OpenSSL to be installed on your system.
+
+#### Installing OpenSSL
+
+**macOS:**
+```bash
+# Using Homebrew (recommended)
+brew install openssl
+
+# Verify installation
+openssl version
+```
+
+**Linux (Ubuntu/Debian):**
+```bash
+sudo apt-get update
+sudo apt-get install openssl
+
+# Verify installation
+openssl version
+```
+
+**Linux (Fedora/RHEL/CentOS):**
+```bash
+sudo dnf install openssl
+# or
+sudo yum install openssl
+
+# Verify installation
+openssl version
+```
+
+**Windows:**
+- OpenSSL will be automatically downloaded and installed if not found (requires internet connection)
+- Alternatively, you can manually install OpenSSL from [Win64OpenSSL](https://slproweb.com/products/Win32OpenSSL.html)
+- Ensure OpenSSL is added to your system PATH
 
 ## Enabling App Sandbox for macOS
 

@@ -39,7 +39,7 @@ void main() {
     );
 
     final certificateManager = CertificateManager.instance;
-    certificateManager.env = ZatcaEnvironment.development;
+    certificateManager.env = ZatcaEnvironment.sandbox;
 
     final keyPair = certificateManager.generateKeyPair();
     privateKeyPem = keyPair['privateKeyPem'];
@@ -112,7 +112,7 @@ void main() {
       previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
     );
 
-    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice, icv: 1);
 
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
@@ -181,7 +181,7 @@ void main() {
       ),
     );
 
-    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice, icv: 1);
 
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
@@ -243,7 +243,7 @@ void main() {
       previousInvoiceHash: "zDnQnE05P6rFMqF1ai21V5hIRlUq/EXvrpsaoPkWRVI=",
     );
 
-    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice, icv: 1);
 
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
@@ -306,7 +306,7 @@ void main() {
       ),
     );
 
-    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+    final qrData = zatcaManager.generateZatcaQrInit(invoice: invoice, icv: 1);
 
     String invoiceHash = qrData.invoiceHash;
     String invoiceXmlString = qrData.xmlString;
