@@ -11,10 +11,13 @@ class Customer {
   /// The address of the customer.
   final Address address;
 
+  final String? businessID;
+
   Customer({
     required this.companyID,
     required this.registrationName,
     required this.address,
+    this.businessID,
   });
 
   /// Creates a [Customer] instance from a [Map].
@@ -23,6 +26,7 @@ class Customer {
       companyID: map['companyID'] ?? '',
       registrationName: map['registrationName'] ?? '',
       address: Address.fromMap(map['address']),
+      businessID: map['businessID'],
     );
   }
 
@@ -32,6 +36,7 @@ class Customer {
       'companyID': companyID,
       'registrationName': registrationName,
       'address': address.toMap(),
+      'businessID': businessID,
     };
   }
 }

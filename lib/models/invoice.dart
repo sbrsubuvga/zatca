@@ -122,7 +122,8 @@ class Invoice extends BaseInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: Customer.fromMap(json['customer']),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))
@@ -196,7 +197,7 @@ class StandardInvoice extends Invoice {
     required super.issueTime,
     required super.currencyCode,
     required super.taxCurrencyCode,
-    super.customer,
+    required Customer super.customer,
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
@@ -212,8 +213,7 @@ class StandardInvoice extends Invoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer:
-          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
+      customer: Customer.fromMap(json['customer']), // Required
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))
@@ -244,14 +244,14 @@ class DBInvoice extends BaseInvoice {
     required super.issueTime,
     required super.currencyCode,
     required super.taxCurrencyCode,
-    required Customer customer,
+    super.customer, // Changed to optional
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.invoiceType,
     required this.cancellation,
-  }) : super(customer: customer);
+  });
 
   factory DBInvoice.fromJson(Map<String, dynamic> json) {
     return DBInvoice(
@@ -261,7 +261,8 @@ class DBInvoice extends BaseInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: Customer.fromMap(json['customer']),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))
@@ -290,7 +291,7 @@ class SimplifiedCreditNoteInvoice extends DBInvoice {
     required super.issueTime,
     required super.currencyCode,
     required super.taxCurrencyCode,
-    required super.customer,
+    super.customer, // Now optional
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
@@ -306,7 +307,8 @@ class SimplifiedCreditNoteInvoice extends DBInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: Customer.fromMap(json['customer']),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))
@@ -334,7 +336,7 @@ class StandardCreditNoteInvoice extends DBInvoice {
     required super.issueTime,
     required super.currencyCode,
     required super.taxCurrencyCode,
-    required super.customer,
+    required Customer super.customer, // Required for standard
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
@@ -350,7 +352,7 @@ class StandardCreditNoteInvoice extends DBInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: Customer.fromMap(json['customer']),
+      customer: Customer.fromMap(json['customer']), // Required
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))
@@ -378,7 +380,7 @@ class SimplifiedDebitNoteInvoice extends DBInvoice {
     required super.issueTime,
     required super.currencyCode,
     required super.taxCurrencyCode,
-    required super.customer,
+    super.customer, // Now optional
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
@@ -394,7 +396,8 @@ class SimplifiedDebitNoteInvoice extends DBInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: Customer.fromMap(json['customer']),
+      customer:
+          json['customer'] != null ? Customer.fromMap(json['customer']) : null,
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))
@@ -422,7 +425,7 @@ class StandardDebitNoteInvoice extends DBInvoice {
     required super.issueTime,
     required super.currencyCode,
     required super.taxCurrencyCode,
-    required super.customer,
+    required Customer super.customer, // Required for standard
     required super.invoiceLines,
     required super.taxAmount,
     required super.totalAmount,
@@ -438,7 +441,7 @@ class StandardDebitNoteInvoice extends DBInvoice {
       issueTime: json['issueTime'],
       currencyCode: json['currencyCode'],
       taxCurrencyCode: json['taxCurrencyCode'],
-      customer: Customer.fromMap(json['customer']),
+      customer: Customer.fromMap(json['customer']), // Required
       invoiceLines:
           (json['invoiceLines'] as List)
               .map((item) => InvoiceLine.fromMap(item))

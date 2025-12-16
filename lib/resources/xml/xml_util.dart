@@ -8,7 +8,11 @@ import 'package:zatca/models/supplier.dart';
 
 class XmlUtil {
   ///     Generate a ZATCA-compliant XML string for the invoice data.
-  static XmlDocument generateZATCAXml(BaseInvoice invoice, Supplier supplier) {
+  static XmlDocument generateZATCAXml(
+    BaseInvoice invoice,
+    Supplier supplier, {
+    required int icv,
+  }) {
     final builder = XmlBuilder();
     final formatter = NumberFormat("#.##");
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
@@ -83,7 +87,7 @@ class XmlUtil {
           'cac:AdditionalDocumentReference',
           nest: () {
             builder.element('cbc:ID', nest: 'ICV');
-            builder.element('cbc:UUID', nest: '1');
+            builder.element('cbc:UUID', nest: icv.toString());
           },
         );
         builder.element(
@@ -193,76 +197,126 @@ class XmlUtil {
             builder.element(
               'cac:Party',
               nest: () {
-                builder.element(
-                  'cac:PartyIdentification',
-                  nest: () {
+                // Check invoice type
+                bool isStandardInvoice =
+                    invoice is StandardInvoice ||
+                    invoice is StandardCreditNoteInvoice ||
+                    invoice is StandardDebitNoteInvoice;
+
+                if (isStandardInvoice && invoice.customer != null) {
+                  // ✅ STANDARD INVOICE - Full customer details
+
+                  // PartyIdentification - CR Number (Commercial Registration)
+                  if (invoice.customer!.businessID != null &&
+                      invoice.customer!.businessID!.isNotEmpty) {
                     builder.element(
-                      'cbc:ID',
-                      nest: () {
-                        builder.attribute('schemeID', 'CRN');
-                        builder.text('');
-                      },
-                    );
-                  },
-                );
-                builder.element(
-                  'cac:PostalAddress',
-                  nest: () {
-                    builder.element(
-                      'cbc:StreetName',
-                      nest: invoice.customer!.address.street,
-                    );
-                    builder.element(
-                      'cbc:BuildingNumber',
-                      nest: invoice.customer!.address.building,
-                    );
-                    builder.element(
-                      'cbc:CitySubdivisionName',
-                      nest: invoice.customer!.address.citySubdivision,
-                    );
-                    builder.element(
-                      'cbc:CityName',
-                      nest: invoice.customer!.address.city,
-                    );
-                    builder.element(
-                      'cbc:PostalZone',
-                      nest: invoice.customer!.address.postalZone,
-                    );
-                    builder.element(
-                      'cac:Country',
+                      'cac:PartyIdentification',
                       nest: () {
                         builder.element(
-                          'cbc:IdentificationCode',
-                          nest: invoice.customer!.address.countryCode,
+                          'cbc:ID',
+                          nest: () {
+                            builder.attribute('schemeID', 'CRN');
+                            builder.text(invoice.customer!.businessID!);
+                          },
                         );
                       },
                     );
-                  },
-                );
-                builder.element(
-                  'cac:PartyTaxScheme',
-                  nest: () {
-                    builder.element(
-                      'cbc:CompanyID',
-                      nest: invoice.customer!.companyID,
-                    );
-                    builder.element(
-                      'cac:TaxScheme',
-                      nest: () {
-                        builder.element('cbc:ID', nest: 'VAT');
-                      },
-                    );
-                  },
-                );
-                builder.element(
-                  'cac:PartyLegalEntity',
-                  nest: () {
-                    builder.element(
-                      'cbc:RegistrationName',
-                      nest: invoice.customer!.registrationName,
-                    );
-                  },
-                );
+                  }
+
+                  // PostalAddress - Full customer address
+                  builder.element(
+                    'cac:PostalAddress',
+                    nest: () {
+                      builder.element(
+                        'cbc:StreetName',
+                        nest: invoice.customer!.address.street,
+                      );
+                      builder.element(
+                        'cbc:BuildingNumber',
+                        nest: invoice.customer!.address.building,
+                      );
+                      builder.element(
+                        'cbc:PlotIdentification',
+                        nest: invoice.customer!.address.building,
+                      );
+                      builder.element(
+                        'cbc:CitySubdivisionName',
+                        nest: invoice.customer!.address.citySubdivision,
+                      );
+                      builder.element(
+                        'cbc:CityName',
+                        nest: invoice.customer!.address.city,
+                      );
+                      builder.element(
+                        'cbc:PostalZone',
+                        nest: invoice.customer!.address.postalZone,
+                      );
+                      builder.element(
+                        'cac:Country',
+                        nest: () {
+                          builder.element(
+                            'cbc:IdentificationCode',
+                            nest: invoice.customer!.address.countryCode,
+                          );
+                        },
+                      );
+                    },
+                  );
+
+                  // PartyTaxScheme - VAT Number
+                  builder.element(
+                    'cac:PartyTaxScheme',
+                    nest: () {
+                      builder.element(
+                        'cbc:CompanyID',
+                        nest: invoice.customer!.companyID,
+                      );
+                      builder.element(
+                        'cac:TaxScheme',
+                        nest: () {
+                          builder.element('cbc:ID', nest: 'VAT');
+                        },
+                      );
+                    },
+                  );
+
+                  // PartyLegalEntity - Customer Name
+                  builder.element(
+                    'cac:PartyLegalEntity',
+                    nest: () {
+                      builder.element(
+                        'cbc:RegistrationName',
+                        nest: invoice.customer!.registrationName,
+                      );
+                    },
+                  );
+                } else {
+                  // ✅ SIMPLIFIED INVOICE - Empty customer fields (B2C)
+                  builder.element(
+                    'cac:PostalAddress',
+                    nest: () {
+                      builder.element('cbc:StreetName', nest: '');
+                    },
+                  );
+                  builder.element(
+                    'cac:PartyTaxScheme',
+                    nest: () {
+                      builder.element('cbc:CompanyID', nest: '');
+                      builder.element(
+                        'cac:TaxScheme',
+                        nest: () {
+                          builder.element('cbc:ID', nest: 'VAT');
+                        },
+                      );
+                    },
+                  );
+                  builder.element(
+                    'cac:PartyLegalEntity',
+                    nest: () {
+                      builder.element('cbc:RegistrationName', nest: '');
+                    },
+                  );
+                }
               },
             );
           },
