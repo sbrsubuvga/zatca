@@ -10,7 +10,6 @@ import 'package:zatca/resources/cirtificate/certficate_util.dart';
 import 'package:zatca/resources/qr_generator.dart';
 import 'package:zatca/resources/signature/signature_util.dart';
 import 'package:zatca/resources/xml/xml_util.dart';
-import 'package:zatca/models/qr_data.dart'; // or wherever QrData is defined
 
 import 'models/supplier.dart';
 
