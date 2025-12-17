@@ -62,8 +62,6 @@ class CertificateManager {
     // final privateKeyFile = '$dbPath/${Uuid().v4()}.pem';
     // final csrConfigFile = '$dbPath/${Uuid().v4()}.cnf';
 
-
-
     final privateKeyFile = '$path/${Uuid().v4()}.pem';
     final csrConfigFile = '$path/${Uuid().v4()}.cnf';
 
@@ -72,7 +70,6 @@ class CertificateManager {
     // final csrConfigFile =
     //     '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.cnf';
 
- 
     try {
       File(privateKeyFile).writeAsStringSync(privateKeyPem);
       File(csrConfigFile).writeAsStringSync(csrProps.toTemplate());
