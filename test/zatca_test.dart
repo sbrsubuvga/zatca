@@ -118,7 +118,6 @@ void main() {
     String invoiceXmlString = qrData.xmlString;
     String qr = zatcaManager.getQrString(qrData);
 
-    print("qr: $qr");
     String ublXML = zatcaManager.generateUBLXml(
       invoiceHash: invoiceHash,
       signingTime:

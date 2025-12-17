@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:basic_utils/basic_utils.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:zatca/resources/api/api.dart';
@@ -61,8 +62,7 @@ class CertificateManager {
     // final privateKeyFile = '$dbPath/${Uuid().v4()}.pem';
     // final csrConfigFile = '$dbPath/${Uuid().v4()}.cnf';
 
-    print("privateKeyPem-$privateKeyPem-");
-    print("csrProps-${csrProps.toTemplate()}-");
+
 
     final privateKeyFile = '$path/${Uuid().v4()}.pem';
     final csrConfigFile = '$path/${Uuid().v4()}.cnf';
@@ -72,15 +72,14 @@ class CertificateManager {
     // final csrConfigFile =
     //     '${Platform.environment['TEMP_FOLDER'] ?? "/tmp/"}${Uuid().v4()}.cnf';
 
-    print(privateKeyFile);
-    print(privateKeyFile);
+ 
     try {
       File(privateKeyFile).writeAsStringSync(privateKeyPem);
       File(csrConfigFile).writeAsStringSync(csrProps.toTemplate());
 
       final opensslCheckProcess = await Process.run('openssl', ['version']);
       if (opensslCheckProcess.exitCode == 0) {
-        print('OpenSSL is installed: ${opensslCheckProcess.stdout}');
+        debugPrint('OpenSSL is installed: ${opensslCheckProcess.stdout}');
       } else {
         if (Platform.isWindows) {
           await _installAndSetupOpenSSLInWindows();
@@ -130,7 +129,7 @@ class CertificateManager {
 
       return csr;
     } catch (e) {
-      print("Error during CSR generation: $e");
+      debugPrint("Error during CSR generation: $e");
 
       // Perform cleanup in case of an error
       if (File(privateKeyFile).existsSync()) {
@@ -153,7 +152,7 @@ class CertificateManager {
       final installerPath =
           'C:\\Users\\${Platform.environment['USERNAME']}\\Downloads\\OpenSSLInstaller.msi';
 
-      print('Downloading OpenSSL installer...');
+      debugPrint('Downloading OpenSSL installer...');
       final downloadProcess = await Process.start('powershell', [
         '-Command',
         'Invoke-WebRequest',
@@ -165,7 +164,7 @@ class CertificateManager {
       await downloadProcess.exitCode;
 
       // Step 2: Install OpenSSL silently
-      print('Installing OpenSSL...');
+      debugPrint('Installing OpenSSL...');
       final installProcess = await Process.start('msiexec', [
         '/i',
         installerPath,
@@ -176,16 +175,16 @@ class CertificateManager {
 
       // Step 3: Add OpenSSL to PATH
       final openSslBinPath = 'C:\\Program Files\\OpenSSL-Win64\\bin';
-      print('Adding OpenSSL to PATH...');
+      debugPrint('Adding OpenSSL to PATH...');
       final pathUpdateProcess = await Process.start('setx', [
         'PATH',
         '%PATH%;$openSslBinPath',
       ], runInShell: true);
       await pathUpdateProcess.exitCode;
 
-      print('OpenSSL installation and setup completed successfully.');
+      debugPrint('OpenSSL installation and setup completed successfully.');
     } catch (e) {
-      print('Error during OpenSSL installation: $e');
+      debugPrint('Error during OpenSSL installation: $e');
     }
   }
 
@@ -240,6 +239,6 @@ class CertificateManager {
           invoiceHash: invoiceHash,
           egsUuid: uuid,
         );
-    print(response);
+    debugPrint("Response: ${response.toString()}");
   }
 }

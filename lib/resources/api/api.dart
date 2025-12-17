@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../enums.dart';
@@ -82,7 +83,7 @@ class ComplianceAPI {
       );
 
       if (response.statusCode != 200) {
-        print("Error: ${response.statusCode}, Body: ${response.body}");
+        debugPrint("Error: ${response.statusCode}, Body: ${response.body}");
         throw Exception("Error issuing a compliance certificate.");
       }
 
@@ -98,7 +99,7 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
         "request_id": data["requestID"],
       };
     } catch (e) {
-      print("An error occurred: $e");
+      debugPrint("An error occurred: $e");
       rethrow;
     }
   }
@@ -127,7 +128,7 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
     );
 
     if (response.statusCode != 200 && response.statusCode != 202) {
-      print("Response: ${response.statusCode}, Body: ${response.body}");
+      debugPrint("Response: ${response.statusCode}, Body: ${response.body}");
       throw Exception("Error in compliance check.");
     }
 

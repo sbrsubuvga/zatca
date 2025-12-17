@@ -219,7 +219,7 @@ class _HomeState extends State<Home> {
     if (isDeskTop) {
       /// Initialize the CertificateManager singleton instance.
       final certificateManager = CertificateManager.instance;
-      certificateManager.env = ZatcaEnvironment.development;
+      certificateManager.env = ZatcaEnvironment.sandbox;
 
       /// Generate a key pair for the EGS unit.
       final keyPair = certificateManager.generateKeyPair();
@@ -327,7 +327,7 @@ class _HomeState extends State<Home> {
 
     setState(() {
       /// Generate QR data for the invoice using the ZatcaManager.
-      qrData = zatcaManager.generateZatcaQrInit(invoice: invoice);
+      qrData = zatcaManager.generateZatcaQrInit(invoice: invoice, icv: 1);
       qr = zatcaManager.getQrString(qrData!);
     });
   }
