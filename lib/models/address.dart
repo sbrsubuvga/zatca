@@ -53,7 +53,7 @@ class Location extends Address {
     required this.plotIdentification,
   });
 
-  get branchLocation {
+  String get branchLocation {
     return '$building $street, $city';
   }
 
