@@ -7,6 +7,9 @@ For more information about ZATCA e-invoicing regulations, visit the [official ZA
 
 For more details, check out our Medium story: [Simplifying ZATCA E-Invoicing in Flutter with the ZATCA Package](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-with-the-zatca-package-9d181243c2a0).
 
+For more insights, you can also read our Medium article: [Simplifying ZATCA E-Invoicing in Flutter with the ZATCA Package (in Flutter)](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-899b99df3511).
+
+
 ---
 
 <a href="https://github.com/sponsors/sbrsubuvga" target="_blank">
@@ -36,7 +39,7 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.6.1
+  zatca: ^0.6.2
 ```
 
 ## Platform Requirements
