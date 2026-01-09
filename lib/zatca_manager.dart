@@ -35,7 +35,7 @@ class ZatcaManager {
   /// [sellerTRN] - The Tax Registration Number (TRN) of the seller.
   /// [issuedCertificateBase64] - The issued certificate from zatca compliance.  only required for generating UBL standard XML
 
-  initializeZacta({
+  void initializeZacta({
     required String privateKeyPem,
     required String certificatePem,
     required Supplier supplier,

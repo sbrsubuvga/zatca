@@ -8,7 +8,7 @@ import 'dart:typed_data';
 /// Throws an `ArgumentError` if the value type is unsupported.
 ///
 /// Returns the TLV encoded string.
-generateTlv(Map<int, dynamic> data) {
+String generateTlv(Map<int, dynamic> data) {
   StringBuffer tlv = StringBuffer();
 
   data.forEach((tag, value) {

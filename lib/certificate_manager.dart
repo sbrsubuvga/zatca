@@ -215,7 +215,7 @@ class CertificateManager {
   }
 
   /// Check invoice compliance
-  checkInvoiceCompliance({
+  Future<void> checkInvoiceCompliance({
     required ZatcaCertificate complianceCertificate,
     required String ublXml,
     required String invoiceHash,
