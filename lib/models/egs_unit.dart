@@ -52,7 +52,7 @@ class EGSUnitInfo {
       egsSerialNumber: uuid,
       solutionName: solutionName,
       vatNumber: vatNumber,
-      branchLocation: location.branchLocation ?? '',
+      branchLocation: location.branchLocation,
       branchIndustry: branchIndustry,
       branchName: branchName,
       taxpayerName: taxpayerName,
