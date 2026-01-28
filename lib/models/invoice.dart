@@ -89,7 +89,7 @@ class BaseInvoice {
       'taxAmount': taxAmount,
       'totalAmount': totalAmount,
       'previousInvoiceHash': previousInvoiceHash,
-      'invoiceType': invoiceType,
+      'invoiceType': invoiceType.index,
     };
   }
 }

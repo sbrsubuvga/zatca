@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.5
+
+* Updates and improvements.
+
 ## 0.6.4
 
 * Fixed missing type annotations in functions.
