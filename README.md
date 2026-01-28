@@ -39,7 +39,7 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.6.5
+  zatca: ^0.6.6
 ```
 
 ## Platform Requirements

@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.6
+
+* Updates and improvements.
+
 ## 0.6.5
 
 * Updates and improvements.

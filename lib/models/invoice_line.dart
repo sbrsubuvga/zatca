@@ -33,9 +33,9 @@ class InvoiceLine {
       itemName: map['itemName'] ?? '',
       taxPercent: map['taxPercent'] ?? '',
       discounts:
-          (map['discounts'] ?? [])
+          List<Discount>.from((map['discounts'] ?? [])
               .map((discount) => Discount.fromMap(discount))
-              .toList(),
+              .toList()),
     );
   }
 
