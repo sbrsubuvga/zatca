@@ -32,10 +32,11 @@ class InvoiceLine {
       lineExtensionAmount: map['lineExtensionAmount'] ?? '',
       itemName: map['itemName'] ?? '',
       taxPercent: map['taxPercent'] ?? '',
-      discounts:
-          List<Discount>.from((map['discounts'] ?? [])
-              .map((discount) => Discount.fromMap(discount))
-              .toList()),
+      discounts: List<Discount>.from(
+        (map['discounts'] ?? [])
+            .map((discount) => Discount.fromMap(discount))
+            .toList(),
+      ),
     );
   }
 
