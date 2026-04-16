@@ -13,10 +13,7 @@ void main() {
     await tester.pump();
 
     expect(find.text('Set up your EGS device'), findsOneWidget);
-    expect(
-      find.text('Fill form with known-good sandbox data'),
-      findsOneWidget,
-    );
+    expect(find.text('Fill with sandbox data'), findsOneWidget);
   });
 
   testWidgets('Environment switcher is visible', (WidgetTester tester) async {

@@ -8,14 +8,14 @@ import 'package:zatca/resources/enums.dart';
 import '../bloc/onboarding/onboarding_bloc.dart';
 import '../bloc/onboarding/onboarding_event.dart';
 import '../bloc/onboarding/onboarding_state.dart';
+import '../ui/breakpoints.dart';
+import '../ui/section_card.dart';
 import '../util/validators.dart';
 import '../widgets/copyable_block.dart';
 import '../widgets/env_info_card.dart';
 import '../widgets/onboarding_stepper.dart';
 
-/// Walks the user through registering an EGS device with ZATCA:
-/// pick env, fill form, generate keypair, CSR, compliance cert,
-/// (optionally) upgrade to production cert.
+/// Walks the user through registering an EGS device with ZATCA.
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -120,201 +120,444 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         }
       },
       builder: (context, state) {
-        return SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Form(
-              key: _formKey,
-              autovalidateMode: AutovalidateMode.onUserInteraction,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  _header(context, state),
-                  const SizedBox(height: 8),
-                  EnvironmentInfoCard(environment: state.environment),
-                  _envSelector(context, state),
-                  const SizedBox(height: 8),
-                  _prefillButton(context),
-                  const SizedBox(height: 16),
-                  _sectionTitle('Taxpayer & EGS device'),
-                  _field(
-                    _taxpayerName,
-                    'Taxpayer name',
-                    helper: 'Legal entity name as registered with ZATCA',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Taxpayer name'),
-                  ),
-                  _field(
-                    _vatNumber,
-                    'VAT number',
-                    helper: '15 digits, starts & ends with 3. '
-                        'Sandbox sample: 399999999900003',
-                    validator: Validators.vatNumber,
-                    keyboardType: TextInputType.number,
-                  ),
-                  _field(
-                    _crn,
-                    'Commercial registration number (CRN)',
-                    helper: 'Any numeric string works for sandbox',
-                    validator: (v) => Validators.required(v, label: 'CRN'),
-                    keyboardType: TextInputType.number,
-                  ),
-                  _field(
-                    _branchName,
-                    'Branch name',
-                    helper: 'Becomes the Organizational Unit in the certificate',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Branch name'),
-                  ),
-                  _field(
-                    _branchIndustry,
-                    'Branch industry',
-                    helper: 'e.g. Food, Retail, Services',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Branch industry'),
-                  ),
-                  _field(
-                    _taxpayerProvidedId,
-                    'EGS device ID',
-                    helper: 'Free text — identifies this specific device',
-                    validator: (v) => Validators.required(v, label: 'Device ID'),
-                  ),
-                  _field(
-                    _model,
-                    'Device model',
-                    helper: 'e.g. Flutter, iOS, Android, Web, POS-1',
-                    validator: (v) => Validators.required(v, label: 'Model'),
-                  ),
-                  const SizedBox(height: 12),
-                  _sectionTitle('Branch address'),
-                  _field(
-                    _street,
-                    'Street',
-                    validator: (v) => Validators.required(v, label: 'Street'),
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _field(
-                          _building,
-                          'Building #',
-                          validator: (v) =>
-                              Validators.required(v, label: 'Building'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _field(_plot, 'Plot ID (optional)'),
-                      ),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _field(
-                          _city,
-                          'City',
-                          validator: (v) => Validators.required(v, label: 'City'),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _field(_citySubdivision, 'City subdivision'),
-                      ),
-                    ],
-                  ),
-                  _field(
-                    _postalZone,
-                    'Postal zone',
-                    keyboardType: TextInputType.number,
-                    validator: (v) =>
-                        Validators.required(v, label: 'Postal zone'),
-                  ),
-                  const SizedBox(height: 12),
-                  _sectionTitle('OTP'),
-                  _field(
-                    _otp,
-                    'One-Time Password',
-                    helper: _otpHelper(state.environment),
-                    validator: Validators.otp,
-                    keyboardType: TextInputType.number,
-                  ),
-                  const SizedBox(height: 16),
-                  _sectionTitle('Progress'),
-                  OnboardingStepper(state: state),
-                  const SizedBox(height: 16),
-                  if (state.errorMessage != null) _errorBanner(state.errorMessage!),
-                  _actionButtons(context, state),
-                  if (state.csrPem != null)
-                    CopyableBlock(
-                      title: 'Generated CSR',
-                      subtitle: 'Sent to ZATCA in step 3',
-                      content: state.csrPem!,
-                      maxLines: 6,
-                    ),
-                  if (state.complianceCertPem != null)
-                    CopyableBlock(
-                      title: 'Compliance certificate',
-                      subtitle:
-                          'Request ID: ${state.complianceRequestId}',
-                      content: state.complianceCertPem!,
-                      maxLines: 6,
-                    ),
-                  if (state.productionCertPem != null)
-                    CopyableBlock(
-                      title: 'Production certificate',
-                      content: state.productionCertPem!,
-                      maxLines: 6,
-                    ),
-                  const SizedBox(height: 40),
-                ],
-              ),
-            ),
+        final twoColumn = Breakpoints.useTwoColumn(context);
+        return PageShell(
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: twoColumn
+                ? _twoColumnLayout(context, state)
+                : _singleColumnLayout(context, state),
           ),
         );
       },
     );
   }
 
+  Widget _singleColumnLayout(BuildContext context, OnboardingState state) =>
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _heroHeader(context, state),
+            Gaps.hMd,
+            _envSection(context, state),
+            Gaps.hMd,
+            _egsSection(context, state),
+            Gaps.hMd,
+            _addressSection(context, state),
+            Gaps.hMd,
+            _otpSection(context, state),
+            Gaps.hMd,
+            _progressSection(context, state),
+            if (state.errorMessage != null) ...[
+              Gaps.hMd,
+              _errorBanner(state.errorMessage!),
+            ],
+            Gaps.hMd,
+            _actionButtons(context, state),
+            Gaps.hMd,
+            if (state.csrPem != null || state.complianceCertPem != null)
+              _outputsSection(context, state),
+            Gaps.hXl,
+          ],
+        ),
+      );
+
+  Widget _twoColumnLayout(BuildContext context, OnboardingState state) =>
+      SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _heroHeader(context, state),
+            Gaps.hMd,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  flex: 5,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _envSection(context, state),
+                      Gaps.hMd,
+                      _egsSection(context, state),
+                      Gaps.hMd,
+                      _addressSection(context, state),
+                      Gaps.hMd,
+                      _otpSection(context, state),
+                      if (state.errorMessage != null) ...[
+                        Gaps.hMd,
+                        _errorBanner(state.errorMessage!),
+                      ],
+                      Gaps.hMd,
+                      _actionButtons(context, state),
+                    ],
+                  ),
+                ),
+                Gaps.wLg,
+                Expanded(
+                  flex: 4,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _progressSection(context, state),
+                      if (state.csrPem != null ||
+                          state.complianceCertPem != null) ...[
+                        Gaps.hMd,
+                        _outputsSection(context, state),
+                      ],
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            Gaps.hXl,
+          ],
+        ),
+      );
+
+  Widget _heroHeader(BuildContext context, OnboardingState state) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(Gaps.lg),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            theme.colorScheme.primaryContainer,
+            theme.colorScheme.tertiaryContainer,
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Set up your EGS device',
+                  style: theme.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                Gaps.hXs,
+                Text(
+                  'Register once per device: generate a key pair, sign a CSR, '
+                  'and exchange it for a compliance certificate with ZATCA.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onPrimaryContainer
+                        .withValues(alpha: 0.85),
+                  ),
+                ),
+                Gaps.hMd,
+                Wrap(
+                  spacing: Gaps.sm,
+                  runSpacing: Gaps.sm,
+                  children: [
+                    FilledButton.tonalIcon(
+                      onPressed: () {
+                        context.read<OnboardingBloc>().add(
+                          const OnboardingPrefilledWithSandboxData(),
+                        );
+                        _prefilled = false;
+                      },
+                      icon: const Icon(Icons.bolt, size: 18),
+                      label: const Text('Fill with sandbox data'),
+                    ),
+                    if (state.isReadyToInvoice)
+                      OutlinedButton.icon(
+                        onPressed: () => _confirmReset(context),
+                        icon: const Icon(Icons.refresh, size: 16),
+                        label: const Text('Reset onboarding'),
+                      ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (Breakpoints.useTwoColumn(context))
+            Padding(
+              padding: const EdgeInsets.only(left: Gaps.md),
+              child: _progressBadge(context, state),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _progressBadge(BuildContext context, OnboardingState state) {
+    final theme = Theme.of(context);
+    final steps = [
+      state.privateKeyPem != null,
+      state.csrPem != null,
+      state.hasComplianceCertificate,
+    ];
+    final done = steps.where((s) => s).length;
+    return Container(
+      padding: const EdgeInsets.all(Gaps.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              SizedBox(
+                width: 64,
+                height: 64,
+                child: CircularProgressIndicator(
+                  value: done / 3,
+                  strokeWidth: 6,
+                  backgroundColor: theme.colorScheme.outlineVariant,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+              Text(
+                '$done/3',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          Gaps.hSm,
+          Text(
+            'Setup steps',
+            style: theme.textTheme.labelMedium,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _envSection(BuildContext context, OnboardingState state) =>
+      SectionCard(
+        icon: Icons.public,
+        title: 'Environment',
+        description: 'Choose which ZATCA endpoint to call.',
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _envSelector(context, state),
+            Gaps.hMd,
+            EnvironmentInfoCard(environment: state.environment),
+          ],
+        ),
+      );
+
+  Widget _egsSection(BuildContext context, OnboardingState state) =>
+      SectionCard(
+        icon: Icons.badge_outlined,
+        title: 'Taxpayer & EGS device',
+        description: 'Identifying info that goes into the certificate.',
+        child: Column(
+          children: [
+            _field(
+              _taxpayerName,
+              'Taxpayer name',
+              helper: 'Legal entity name as registered with ZATCA',
+              validator: (v) =>
+                  Validators.required(v, label: 'Taxpayer name'),
+            ),
+            Gaps.hSm,
+            _field(
+              _vatNumber,
+              'VAT number',
+              helper:
+                  '15 digits, starts & ends with 3. Sandbox: 399999999900003',
+              validator: Validators.vatNumber,
+              keyboardType: TextInputType.number,
+            ),
+            Gaps.hSm,
+            _field(
+              _crn,
+              'Commercial registration number (CRN)',
+              helper: 'Any numeric string works for sandbox',
+              validator: (v) => Validators.required(v, label: 'CRN'),
+              keyboardType: TextInputType.number,
+            ),
+            Gaps.hMd,
+            const Subheading('Branch'),
+            Row(
+              children: [
+                Expanded(
+                  child: _field(
+                    _branchName,
+                    'Branch name',
+                    helper: 'Becomes the OU in the cert',
+                    validator: (v) =>
+                        Validators.required(v, label: 'Branch name'),
+                  ),
+                ),
+                Gaps.wSm,
+                Expanded(
+                  child: _field(
+                    _branchIndustry,
+                    'Branch industry',
+                    helper: 'e.g. Food, Retail',
+                    validator: (v) => Validators.required(
+                      v,
+                      label: 'Branch industry',
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            Gaps.hMd,
+            const Subheading('Device'),
+            Row(
+              children: [
+                Expanded(
+                  child: _field(
+                    _taxpayerProvidedId,
+                    'EGS device ID',
+                    helper: 'Free text, e.g. POS-01',
+                    validator: (v) =>
+                        Validators.required(v, label: 'Device ID'),
+                  ),
+                ),
+                Gaps.wSm,
+                Expanded(
+                  child: _field(
+                    _model,
+                    'Device model',
+                    helper: 'Free text, e.g. iOS, Android',
+                    validator: (v) =>
+                        Validators.required(v, label: 'Model'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+
+  Widget _addressSection(BuildContext context, OnboardingState state) =>
+      SectionCard(
+        icon: Icons.location_on_outlined,
+        title: 'Branch address',
+        description: 'Physical address embedded in the certificate subject.',
+        child: Column(
+          children: [
+            _field(
+              _street,
+              'Street',
+              validator: (v) => Validators.required(v, label: 'Street'),
+            ),
+            Gaps.hSm,
+            Row(
+              children: [
+                Expanded(
+                  child: _field(
+                    _building,
+                    'Building #',
+                    validator: (v) =>
+                        Validators.required(v, label: 'Building'),
+                  ),
+                ),
+                Gaps.wSm,
+                Expanded(
+                  child: _field(_plot, 'Plot ID (optional)'),
+                ),
+              ],
+            ),
+            Gaps.hSm,
+            Row(
+              children: [
+                Expanded(
+                  child: _field(
+                    _city,
+                    'City',
+                    validator: (v) => Validators.required(v, label: 'City'),
+                  ),
+                ),
+                Gaps.wSm,
+                Expanded(
+                  child: _field(_citySubdivision, 'City subdivision'),
+                ),
+              ],
+            ),
+            Gaps.hSm,
+            _field(
+              _postalZone,
+              'Postal zone',
+              keyboardType: TextInputType.number,
+              validator: (v) =>
+                  Validators.required(v, label: 'Postal zone'),
+            ),
+          ],
+        ),
+      );
+
+  Widget _otpSection(BuildContext context, OnboardingState state) =>
+      SectionCard(
+        icon: Icons.lock_outline,
+        title: 'One-Time Password',
+        description: _otpHelper(state.environment),
+        child: _field(
+          _otp,
+          'OTP',
+          validator: Validators.otp,
+          keyboardType: TextInputType.number,
+        ),
+      );
+
+  Widget _progressSection(BuildContext context, OnboardingState state) =>
+      SectionCard(
+        icon: Icons.timeline,
+        title: 'Progress',
+        description: 'Each step in the ZATCA onboarding pipeline.',
+        child: OnboardingStepper(state: state),
+      );
+
+  Widget _outputsSection(BuildContext context, OnboardingState state) =>
+      SectionCard(
+        icon: Icons.description_outlined,
+        title: 'Generated artifacts',
+        description: 'Copy these to verify or archive.',
+        child: Column(
+          children: [
+            if (state.csrPem != null)
+              CopyableBlock(
+                title: 'Certificate Signing Request',
+                subtitle: 'Sent to ZATCA to request a compliance cert.',
+                content: state.csrPem!,
+                maxLines: 4,
+              ),
+            if (state.complianceCertPem != null)
+              CopyableBlock(
+                title: 'Compliance certificate',
+                subtitle: 'Request ID: ${state.complianceRequestId}',
+                content: state.complianceCertPem!,
+                maxLines: 4,
+              ),
+            if (state.productionCertPem != null)
+              CopyableBlock(
+                title: 'Production certificate',
+                content: state.productionCertPem!,
+                maxLines: 4,
+              ),
+          ],
+        ),
+      );
+
   String _otpHelper(ZatcaEnvironment env) => switch (env) {
     ZatcaEnvironment.sandbox =>
       'Sandbox uses the fixed OTP 123456 — any CSR will be accepted.',
     ZatcaEnvironment.simulation =>
-      'Get an OTP from fatoora.zatca.gov.sa → Onboard new solution/device.',
+      'Get an OTP from fatoora.zatca.gov.sa → Onboard new device.',
     ZatcaEnvironment.production =>
       '⚠️ Production. Get OTP from Fatoora portal — real invoices will be signed.',
   };
-
-  Widget _header(BuildContext context, OnboardingState state) {
-    final theme = Theme.of(context);
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Text(
-              'Set up your EGS device',
-              style: theme.textTheme.headlineSmall?.copyWith(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const Spacer(),
-            if (state.isReadyToInvoice)
-              TextButton.icon(
-                onPressed: () => _confirmReset(context),
-                icon: const Icon(Icons.refresh, size: 16),
-                label: const Text('Reset'),
-              ),
-          ],
-        ),
-        Text(
-          'Once per device: generate a key pair, sign a CSR, and exchange it for a '
-          'compliance certificate with ZATCA.',
-          style: theme.textTheme.bodySmall,
-        ),
-      ],
-    );
-  }
 
   Widget _envSelector(BuildContext context, OnboardingState state) {
     return SegmentedButton<ZatcaEnvironment>(
@@ -336,38 +579,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
       ],
       selected: {state.environment},
-      onSelectionChanged: (s) {
-        context.read<OnboardingBloc>().add(
-          OnboardingEnvironmentChanged(s.first),
-        );
-      },
-    );
-  }
-
-  Widget _prefillButton(BuildContext context) {
-    return OutlinedButton.icon(
-      onPressed: () {
-        context.read<OnboardingBloc>().add(
-          const OnboardingPrefilledWithSandboxData(),
-        );
-        _prefilled = false;
-      },
-      icon: const Icon(Icons.bolt),
-      label: const Text('Fill form with known-good sandbox data'),
-    );
-  }
-
-  Widget _sectionTitle(String title) => Padding(
-    padding: const EdgeInsets.only(top: 16, bottom: 4),
-    child: Text(
-      title.toUpperCase(),
-      style: const TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 1,
+      onSelectionChanged: (s) => context.read<OnboardingBloc>().add(
+        OnboardingEnvironmentChanged(s.first),
       ),
-    ),
-  );
+    );
+  }
 
   Widget _field(
     TextEditingController controller,
@@ -375,54 +591,52 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     String? helper,
     String? Function(String?)? validator,
     TextInputType? keyboardType,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          helperText: helper,
-          helperMaxLines: 3,
-          border: const OutlineInputBorder(),
-          isDense: true,
-        ),
-        validator: validator,
-      ),
-    );
-  }
+  }) => TextFormField(
+    controller: controller,
+    keyboardType: keyboardType,
+    decoration: InputDecoration(
+      labelText: label,
+      helperText: helper,
+      helperMaxLines: 3,
+    ),
+    validator: validator,
+  );
 
-  Widget _errorBanner(String message) => Card(
-    color: Theme.of(context).colorScheme.errorContainer,
-    child: Padding(
-      padding: const EdgeInsets.all(12),
+  Widget _errorBanner(String message) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(Gaps.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.errorContainer,
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Row(
         children: [
           Icon(
             Icons.error_outline,
-            color: Theme.of(context).colorScheme.onErrorContainer,
+            color: theme.colorScheme.onErrorContainer,
           ),
-          const SizedBox(width: 8),
+          Gaps.wSm,
           Expanded(
             child: Text(
               message,
               style: TextStyle(
-                color: Theme.of(context).colorScheme.onErrorContainer,
+                color: theme.colorScheme.onErrorContainer,
+                height: 1.4,
               ),
             ),
           ),
         ],
       ),
-    ),
-  );
+    );
+  }
 
   Widget _actionButtons(BuildContext context, OnboardingState state) {
     final isSubmitting = state.status == OnboardingStatus.submitting;
     return Column(
       children: [
         SizedBox(
-          width: double.infinity,
+          height: 52,
           child: FilledButton.icon(
             onPressed: isSubmitting
                 ? null
@@ -435,39 +649,40 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   },
             icon: isSubmitting
                 ? const SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Colors.white,
+                    ),
                   )
                 : const Icon(Icons.verified_user),
             label: Text(
               state.hasComplianceCertificate
                   ? 'Re-issue compliance certificate'
                   : 'Generate keypair, CSR & request compliance cert',
-            ),
-            style: FilledButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 14),
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
         ),
-        if (state.hasComplianceCertificate && !state.hasProductionCertificate)
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                onPressed: isSubmitting
-                    ? null
-                    : () => context.read<OnboardingBloc>().add(
-                        const OnboardingProductionUpgradeRequested(),
-                      ),
-                icon: const Icon(Icons.upgrade),
-                label: const Text(
-                  'Upgrade to production certificate (optional)',
-                ),
+        if (state.hasComplianceCertificate &&
+            !state.hasProductionCertificate) ...[
+          Gaps.hSm,
+          SizedBox(
+            height: 48,
+            child: OutlinedButton.icon(
+              onPressed: isSubmitting
+                  ? null
+                  : () => context.read<OnboardingBloc>().add(
+                      const OnboardingProductionUpgradeRequested(),
+                    ),
+              icon: const Icon(Icons.upgrade),
+              label: const Text(
+                'Upgrade to production certificate (optional)',
               ),
             ),
           ),
+        ],
       ],
     );
   }
@@ -479,8 +694,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         title: const Text('Reset onboarding?'),
         content: const Text(
           'This deletes the private key, certificate, and all saved progress '
-          '(including ICV counter and previous invoice hash). You\'ll need to '
-          'request a new compliance certificate with a fresh OTP.',
+          '(including ICV counter and previous invoice hash). You\'ll need '
+          'a new OTP to request a new compliance certificate.',
         ),
         actions: [
           TextButton(

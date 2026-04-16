@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-/// A bordered monospace text block with a "copy" button.
-/// Used throughout the result screen to make hashes, PEMs, and
-/// XML copy-pasteable for debugging.
-class CopyableBlock extends StatelessWidget {
+import '../ui/breakpoints.dart';
+
+/// Bordered monospace block with a one-tap copy button. Used on
+/// the result screen to make hashes, PEMs, and XML copy-pasteable.
+class CopyableBlock extends StatefulWidget {
   final String title;
   final String content;
   final int? maxLines;
@@ -19,64 +20,95 @@ class CopyableBlock extends StatelessWidget {
   });
 
   @override
+  State<CopyableBlock> createState() => _CopyableBlockState();
+}
+
+class _CopyableBlockState extends State<CopyableBlock> {
+  bool _copied = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: Gaps.xs),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(Gaps.sm, Gaps.sm, Gaps.xs, 0),
+            child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    title,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      if (widget.subtitle != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            widget.subtitle!,
+                            style: theme.textTheme.bodySmall,
+                          ),
+                        ),
+                    ],
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.copy, size: 18),
-                  tooltip: 'Copy',
-                  onPressed: () {
-                    Clipboard.setData(ClipboardData(text: content));
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Copied $title'),
-                        duration: const Duration(seconds: 1),
-                      ),
+                  icon: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      _copied ? Icons.check : Icons.copy_outlined,
+                      key: ValueKey(_copied),
+                      size: 18,
+                      color: _copied ? Colors.green : null,
+                    ),
+                  ),
+                  tooltip: _copied ? 'Copied!' : 'Copy',
+                  onPressed: () async {
+                    await Clipboard.setData(
+                      ClipboardData(text: widget.content),
                     );
+                    if (!mounted) return;
+                    setState(() => _copied = true);
+                    Future.delayed(const Duration(seconds: 2), () {
+                      if (mounted) setState(() => _copied = false);
+                    });
                   },
                 ),
               ],
             ),
-            if (subtitle != null)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(subtitle!, style: theme.textTheme.bodySmall),
-              ),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surfaceContainerHighest,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: SelectableText(
-                content,
-                maxLines: maxLines,
-                style: TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 11,
-                  color: theme.colorScheme.onSurface,
-                ),
+          ),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.fromLTRB(
+              Gaps.sm,
+              Gaps.xs,
+              Gaps.sm,
+              Gaps.sm,
+            ),
+            child: SelectableText(
+              widget.content,
+              maxLines: widget.maxLines,
+              style: TextStyle(
+                fontFamily: 'monospace',
+                fontSize: 11,
+                height: 1.4,
+                color: theme.colorScheme.onSurface,
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

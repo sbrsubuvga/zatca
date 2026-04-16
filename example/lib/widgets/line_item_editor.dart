@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../bloc/invoice/invoice_state.dart';
+import '../ui/breakpoints.dart';
 
-/// A compact card that lets the user edit a single invoice line
-/// — quantity, unit code, price, tax %, and optional discount.
+/// Compact inline editor for a single invoice line. Responsive:
+/// collapses to a single column on narrow screens.
 class LineItemEditor extends StatefulWidget {
   final int index;
   final InvoiceLineDraft draft;
@@ -45,35 +46,36 @@ class _LineItemEditorState extends State<LineItemEditor> {
 
   @override
   void dispose() {
-    _name.dispose();
-    _qty.dispose();
-    _price.dispose();
-    _tax.dispose();
-    _discount.dispose();
-    _reason.dispose();
+    for (final c in [_name, _qty, _price, _tax, _discount, _reason]) {
+      c.dispose();
+    }
     super.dispose();
   }
 
-  void _emit() {
-    widget.onChanged(
-      widget.draft.copyWith(
-        itemName: _name.text,
-        quantity: _qty.text,
-        unitPrice: _price.text,
-        taxPercent: _tax.text,
-        discountAmount: _discount.text,
-        discountReason: _reason.text,
-      ),
-    );
-  }
+  void _emit() => widget.onChanged(
+    widget.draft.copyWith(
+      itemName: _name.text,
+      quantity: _qty.text,
+      unitPrice: _price.text,
+      taxPercent: _tax.text,
+      discountAmount: _discount.text,
+      discountReason: _reason.text,
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 6),
+    final narrow = MediaQuery.of(context).size.width < 680;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: Gaps.xs),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerLowest,
+        border: Border.all(color: theme.colorScheme.outlineVariant),
+        borderRadius: BorderRadius.circular(10),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(Gaps.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -82,18 +84,27 @@ class _LineItemEditorState extends State<LineItemEditor> {
                 Container(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 8,
-                    vertical: 4,
+                    vertical: 3,
                   ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.secondaryContainer,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     'Line ${widget.index + 1}',
-                    style: theme.textTheme.labelSmall,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
                 const Spacer(),
+                Text(
+                  '${widget.draft.lineTotal.toStringAsFixed(2)} SAR',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
                 if (widget.canRemove)
                   IconButton(
                     tooltip: 'Remove line',
@@ -102,67 +113,83 @@ class _LineItemEditorState extends State<LineItemEditor> {
                   ),
               ],
             ),
-            const SizedBox(height: 8),
+            Gaps.hSm,
             TextField(
               controller: _name,
-              decoration: const InputDecoration(
-                labelText: 'Item name',
-                isDense: true,
-              ),
+              decoration: const InputDecoration(labelText: 'Item name'),
               onChanged: (_) => _emit(),
             ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _qty,
-                    decoration: const InputDecoration(
-                      labelText: 'Quantity',
-                      isDense: true,
-                    ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (_) => _emit(),
-                  ),
+            Gaps.hSm,
+            if (narrow) ...[
+              TextField(
+                controller: _qty,
+                decoration: const InputDecoration(labelText: 'Quantity'),
+                keyboardType: TextInputType.number,
+                onChanged: (_) => _emit(),
+              ),
+              Gaps.hSm,
+              TextField(
+                controller: _price,
+                decoration: const InputDecoration(
+                  labelText: 'Unit price (SAR)',
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: TextField(
-                    controller: _price,
-                    decoration: const InputDecoration(
-                      labelText: 'Unit price (SAR)',
-                      isDense: true,
-                    ),
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    onChanged: (_) => _emit(),
-                  ),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
                 ),
-                const SizedBox(width: 8),
-                SizedBox(
-                  width: 90,
-                  child: TextField(
-                    controller: _tax,
-                    decoration: const InputDecoration(
-                      labelText: 'VAT %',
-                      isDense: true,
+                onChanged: (_) => _emit(),
+              ),
+              Gaps.hSm,
+              TextField(
+                controller: _tax,
+                decoration: const InputDecoration(labelText: 'VAT %'),
+                keyboardType: TextInputType.number,
+                onChanged: (_) => _emit(),
+              ),
+            ] else
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _qty,
+                      decoration: const InputDecoration(labelText: 'Qty'),
+                      keyboardType: TextInputType.number,
+                      onChanged: (_) => _emit(),
                     ),
-                    keyboardType: TextInputType.number,
-                    onChanged: (_) => _emit(),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
+                  Gaps.wSm,
+                  Expanded(
+                    flex: 2,
+                    child: TextField(
+                      controller: _price,
+                      decoration: const InputDecoration(
+                        labelText: 'Unit price (SAR)',
+                      ),
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      onChanged: (_) => _emit(),
+                    ),
+                  ),
+                  Gaps.wSm,
+                  SizedBox(
+                    width: 80,
+                    child: TextField(
+                      controller: _tax,
+                      decoration: const InputDecoration(labelText: 'VAT %'),
+                      keyboardType: TextInputType.number,
+                      onChanged: (_) => _emit(),
+                    ),
+                  ),
+                ],
+              ),
+            Gaps.hSm,
             Row(
               children: [
                 Expanded(
                   child: TextField(
                     controller: _discount,
                     decoration: const InputDecoration(
-                      labelText: 'Discount (SAR, optional)',
-                      isDense: true,
+                      labelText: 'Discount (optional)',
                     ),
                     keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
@@ -170,28 +197,33 @@ class _LineItemEditorState extends State<LineItemEditor> {
                     onChanged: (_) => _emit(),
                   ),
                 ),
-                const SizedBox(width: 8),
+                Gaps.wSm,
                 Expanded(
                   flex: 2,
                   child: TextField(
                     controller: _reason,
                     decoration: const InputDecoration(
                       labelText: 'Discount reason',
-                      isDense: true,
                     ),
                     onChanged: (_) => _emit(),
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: Text(
-                'Subtotal: ${widget.draft.lineExtensionAmount.toStringAsFixed(2)}  •  '
-                'VAT: ${widget.draft.lineTax.toStringAsFixed(2)}  •  '
-                'Total: ${widget.draft.lineTotal.toStringAsFixed(2)}',
-                style: theme.textTheme.bodySmall,
+            Gaps.hSm,
+            DefaultTextStyle(
+              style: theme.textTheme.bodySmall!.copyWith(
+                color: theme.hintColor,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(
+                    'Subtotal ${widget.draft.lineExtensionAmount.toStringAsFixed(2)}',
+                  ),
+                  const SizedBox(width: 12),
+                  Text('VAT ${widget.draft.lineTax.toStringAsFixed(2)}'),
+                ],
               ),
             ),
           ],
