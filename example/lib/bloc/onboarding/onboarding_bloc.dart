@@ -44,11 +44,12 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
 
     final egs = egsJson != null ? EgsUnitJson.fromJson(egsJson) : null;
 
-    final status = production != null
-        ? OnboardingStatus.productionIssued
-        : compliance != null
-        ? OnboardingStatus.complianceIssued
-        : OnboardingStatus.editing;
+    final status =
+        production != null
+            ? OnboardingStatus.productionIssued
+            : compliance != null
+            ? OnboardingStatus.complianceIssued
+            : OnboardingStatus.editing;
 
     emit(
       state.copyWith(
@@ -172,9 +173,7 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         tempDir.path,
       );
 
-      emit(
-        state.copyWith(csrPem: csr, status: OnboardingStatus.csrGenerated),
-      );
+      emit(state.copyWith(csrPem: csr, status: OnboardingStatus.csrGenerated));
 
       final ZatcaCertificate compliance = await certificateManager
           .issueComplianceCertificate(

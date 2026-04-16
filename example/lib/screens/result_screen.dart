@@ -114,9 +114,7 @@ class ResultScreen extends StatelessWidget {
   Widget _statusBanner(BuildContext context, InvoiceState state) {
     final theme = Theme.of(context);
     final ok = state.status == InvoiceStatus.success;
-    final color = ok
-        ? theme.colorScheme.primary
-        : theme.colorScheme.error;
+    final color = ok ? theme.colorScheme.primary : theme.colorScheme.error;
     return Container(
       padding: const EdgeInsets.all(Gaps.lg),
       decoration: BoxDecoration(
@@ -153,8 +151,8 @@ class ResultScreen extends StatelessWidget {
                 Text(
                   ok
                       ? (state.kind.isStandard
-                            ? 'Cleared by ZATCA'
-                            : 'Reported to ZATCA')
+                          ? 'Cleared by ZATCA'
+                          : 'Reported to ZATCA')
                       : 'Submission failed',
                   style: theme.textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.w700,
@@ -221,9 +219,7 @@ class ResultScreen extends StatelessWidget {
       title: 'QR code TLV breakdown',
       description: 'Each ZATCA-defined tag carried inside the QR.',
       child: Column(
-        children: [
-          for (final entry in tags.entries) _tlvRow(context, entry),
-        ],
+        children: [for (final entry in tags.entries) _tlvRow(context, entry)],
       ),
     );
   }
@@ -307,8 +303,7 @@ class ResultScreen extends StatelessWidget {
   Widget _xmlSection(BuildContext context, InvoiceState state) => SectionCard(
     icon: Icons.code,
     title: 'Signed UBL XML',
-    description:
-        'Paste into ZATCA\'s XML validator to verify externally.',
+    description: 'Paste into ZATCA\'s XML validator to verify externally.',
     child: CopyableBlock(
       title: 'Final XML sent to ZATCA',
       content: state.ublXml ?? '',
@@ -336,13 +331,13 @@ class ResultScreen extends StatelessWidget {
           context,
           3,
           'For production, upgrade to a production cert (Onboarding tab) '
-              'and switch the environment to production.',
+          'and switch the environment to production.',
         ),
         _step(
           context,
           4,
           'Chain invoices: the next invoice\'s PIH is this invoice\'s hash. '
-              'The example handles that automatically via SharedPreferences.',
+          'The example handles that automatically via SharedPreferences.',
         ),
       ],
     ),

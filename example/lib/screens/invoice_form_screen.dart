@@ -75,9 +75,9 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
           _startedOnce = true;
         }
         if (state.status == InvoiceStatus.success) {
-          Navigator.of(context).push(
-            MaterialPageRoute(builder: (_) => const ResultScreen()),
-          );
+          Navigator.of(
+            context,
+          ).push(MaterialPageRoute(builder: (_) => const ResultScreen()));
         }
       },
       builder: (context, state) {
@@ -87,9 +87,10 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
         }
         final twoColumn = Breakpoints.useTwoColumn(context);
         return PageShell(
-          child: twoColumn
-              ? _twoColumnLayout(context, state, onboarding)
-              : _singleColumnLayout(context, state, onboarding),
+          child:
+              twoColumn
+                  ? _twoColumnLayout(context, state, onboarding)
+                  : _singleColumnLayout(context, state, onboarding),
         );
       },
     );
@@ -298,21 +299,22 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
     child: DropdownButtonFormField<InvoiceKind>(
       initialValue: state.kind,
       decoration: const InputDecoration(labelText: 'Type'),
-      items: InvoiceKind.values
-          .map(
-            (k) => DropdownMenuItem(
-              value: k,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(k.label),
-                  const SizedBox(width: 8),
-                  _audienceChip(context, k),
-                ],
-              ),
-            ),
-          )
-          .toList(),
+      items:
+          InvoiceKind.values
+              .map(
+                (k) => DropdownMenuItem(
+                  value: k,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(k.label),
+                      const SizedBox(width: 8),
+                      _audienceChip(context, k),
+                    ],
+                  ),
+                ),
+              )
+              .toList(),
       onChanged: (k) {
         if (k != null) {
           context.read<InvoiceBloc>().add(InvoiceKindChanged(k));
@@ -340,26 +342,29 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
     );
   }
 
-  Widget _detailsSection(BuildContext context, InvoiceState state) =>
-      SectionCard(
-        icon: Icons.tag,
-        title: 'Invoice details',
-        child: Column(
-          children: [
-            TextField(
-              controller: _invoiceNumber,
-              decoration: const InputDecoration(
-                labelText: 'Invoice number',
-                helperText: 'Sequential ID visible to the customer',
-              ),
-              onChanged: (v) =>
-                  context.read<InvoiceBloc>().add(InvoiceNumberChanged(v)),
-            ),
-            Gaps.hSm,
-            DropdownButtonFormField<ZATCAPaymentMethods>(
-              initialValue: state.paymentMethod,
-              decoration: const InputDecoration(labelText: 'Payment method'),
-              items: ZATCAPaymentMethods.values
+  Widget _detailsSection(
+    BuildContext context,
+    InvoiceState state,
+  ) => SectionCard(
+    icon: Icons.tag,
+    title: 'Invoice details',
+    child: Column(
+      children: [
+        TextField(
+          controller: _invoiceNumber,
+          decoration: const InputDecoration(
+            labelText: 'Invoice number',
+            helperText: 'Sequential ID visible to the customer',
+          ),
+          onChanged:
+              (v) => context.read<InvoiceBloc>().add(InvoiceNumberChanged(v)),
+        ),
+        Gaps.hSm,
+        DropdownButtonFormField<ZATCAPaymentMethods>(
+          initialValue: state.paymentMethod,
+          decoration: const InputDecoration(labelText: 'Payment method'),
+          items:
+              ZATCAPaymentMethods.values
                   .map(
                     (p) => DropdownMenuItem(
                       value: p,
@@ -367,17 +372,15 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
                     ),
                   )
                   .toList(),
-              onChanged: (p) {
-                if (p != null) {
-                  context.read<InvoiceBloc>().add(
-                    InvoicePaymentMethodChanged(p),
-                  );
-                }
-              },
-            ),
-          ],
+          onChanged: (p) {
+            if (p != null) {
+              context.read<InvoiceBloc>().add(InvoicePaymentMethodChanged(p));
+            }
+          },
         ),
-      );
+      ],
+    ),
+  );
 
   Widget _customerSection(BuildContext context, InvoiceState state) =>
       SectionCard(
@@ -395,38 +398,40 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
         child: _cancellationForm(context, state),
       );
 
-  Widget _linesSection(BuildContext context, InvoiceState state) =>
-      SectionCard(
-        icon: Icons.list_alt,
-        title: 'Line items',
-        description: '${state.lines.length} item${state.lines.length == 1 ? "" : "s"}',
-        trailing: FilledButton.tonalIcon(
-          onPressed: () =>
-              context.read<InvoiceBloc>().add(const InvoiceLineAdded()),
-          icon: const Icon(Icons.add, size: 18),
-          label: const Text('Add'),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            minimumSize: const Size(0, 36),
-          ),
-        ),
-        child: Column(
-          children: [
-            for (final entry in state.lines.asMap().entries)
-              LineItemEditor(
-                index: entry.key,
-                draft: entry.value,
-                canRemove: state.lines.length > 1,
-                onChanged: (draft) => context.read<InvoiceBloc>().add(
+  Widget _linesSection(BuildContext context, InvoiceState state) => SectionCard(
+    icon: Icons.list_alt,
+    title: 'Line items',
+    description:
+        '${state.lines.length} item${state.lines.length == 1 ? "" : "s"}',
+    trailing: FilledButton.tonalIcon(
+      onPressed:
+          () => context.read<InvoiceBloc>().add(const InvoiceLineAdded()),
+      icon: const Icon(Icons.add, size: 18),
+      label: const Text('Add'),
+      style: FilledButton.styleFrom(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        minimumSize: const Size(0, 36),
+      ),
+    ),
+    child: Column(
+      children: [
+        for (final entry in state.lines.asMap().entries)
+          LineItemEditor(
+            index: entry.key,
+            draft: entry.value,
+            canRemove: state.lines.length > 1,
+            onChanged:
+                (draft) => context.read<InvoiceBloc>().add(
                   InvoiceLineUpdated(entry.key, draft),
                 ),
-                onRemove: () => context.read<InvoiceBloc>().add(
+            onRemove:
+                () => context.read<InvoiceBloc>().add(
                   InvoiceLineRemoved(entry.key),
                 ),
-              ),
-          ],
-        ),
-      );
+          ),
+      ],
+    ),
+  );
 
   Widget _customerForm(BuildContext context, InvoiceState state) {
     void emit() {
@@ -434,17 +439,13 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
         InvoiceCustomerChanged(
           Customer(
             companyID: _custVat.text,
-            registrationName: _custName.text.isEmpty
-                ? 'Customer'
-                : _custName.text,
-            businessID: _custBusinessId.text.isEmpty
-                ? null
-                : _custBusinessId.text,
+            registrationName:
+                _custName.text.isEmpty ? 'Customer' : _custName.text,
+            businessID:
+                _custBusinessId.text.isEmpty ? null : _custBusinessId.text,
             address: Address(
               street: _custStreet.text,
-              building: _custBuilding.text.isEmpty
-                  ? '00'
-                  : _custBuilding.text,
+              building: _custBuilding.text.isEmpty ? '00' : _custBuilding.text,
               citySubdivision: '',
               city: _custCity.text,
               postalZone: _custPostal.text,
@@ -458,9 +459,7 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
       children: [
         TextField(
           controller: _custName,
-          decoration: const InputDecoration(
-            labelText: 'Customer legal name',
-          ),
+          decoration: const InputDecoration(labelText: 'Customer legal name'),
           onChanged: (_) => emit(),
         ),
         Gaps.hSm,
@@ -566,7 +565,12 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
       description: 'Calculated from line items above.',
       child: Column(
         children: [
-          _totalRow(theme, 'Subtotal', state.subtotal, Icons.shopping_cart_outlined),
+          _totalRow(
+            theme,
+            'Subtotal',
+            state.subtotal,
+            Icons.shopping_cart_outlined,
+          ),
           _totalRow(theme, 'VAT', state.taxTotal, Icons.percent),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: Gaps.sm),
@@ -591,9 +595,10 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
     IconData icon, {
     bool emphasized = false,
   }) {
-    final style = emphasized
-        ? theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)
-        : theme.textTheme.bodyMedium;
+    final style =
+        emphasized
+            ? theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800)
+            : theme.textTheme.bodyMedium;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
@@ -621,10 +626,7 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: theme.colorScheme.onErrorContainer,
-          ),
+          Icon(Icons.error_outline, color: theme.colorScheme.onErrorContainer),
           Gaps.wSm,
           Expanded(
             child: Text(
@@ -642,19 +644,22 @@ class _InvoiceFormScreenState extends State<InvoiceFormScreen> {
     return SizedBox(
       height: 56,
       child: FilledButton.icon(
-        onPressed: submitting
-            ? null
-            : () => context.read<InvoiceBloc>().add(const InvoiceSubmitted()),
-        icon: submitting
-            ? const SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: Colors.white,
-                ),
-              )
-            : const Icon(Icons.send),
+        onPressed:
+            submitting
+                ? null
+                : () =>
+                    context.read<InvoiceBloc>().add(const InvoiceSubmitted()),
+        icon:
+            submitting
+                ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                )
+                : const Icon(Icons.send),
         label: Text(
           state.kind.isStandard
               ? 'Sign & submit for clearance'

@@ -107,10 +107,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<OnboardingBloc, OnboardingState>(
-      listenWhen: (prev, curr) =>
-          prev.egs?.vatNumber != curr.egs?.vatNumber ||
-          prev.otp != curr.otp ||
-          (prev.egs == null && curr.egs != null),
+      listenWhen:
+          (prev, curr) =>
+              prev.egs?.vatNumber != curr.egs?.vatNumber ||
+              prev.otp != curr.otp ||
+              (prev.egs == null && curr.egs != null),
       listener: (context, state) {
         if (state.egs != null && !_prefilled) {
           _hydrate(state);
@@ -125,9 +126,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           child: Form(
             key: _formKey,
             autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: twoColumn
-                ? _twoColumnLayout(context, state)
-                : _singleColumnLayout(context, state),
+            child:
+                twoColumn
+                    ? _twoColumnLayout(context, state)
+                    : _singleColumnLayout(context, state),
           ),
         );
       },
@@ -252,8 +254,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   'Register once per device: generate a key pair, sign a CSR, '
                   'and exchange it for a compliance certificate with ZATCA.',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onPrimaryContainer
-                        .withValues(alpha: 0.85),
+                    color: theme.colorScheme.onPrimaryContainer.withValues(
+                      alpha: 0.85,
+                    ),
                   ),
                 ),
                 Gaps.hMd,
@@ -330,10 +333,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             ],
           ),
           Gaps.hSm,
-          Text(
-            'Setup steps',
-            style: theme.textTheme.labelMedium,
-          ),
+          Text('Setup steps', style: theme.textTheme.labelMedium),
         ],
       ),
     );
@@ -354,92 +354,87 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
       );
 
-  Widget _egsSection(BuildContext context, OnboardingState state) =>
-      SectionCard(
-        icon: Icons.badge_outlined,
-        title: 'Taxpayer & EGS device',
-        description: 'Identifying info that goes into the certificate.',
-        child: Column(
+  Widget _egsSection(
+    BuildContext context,
+    OnboardingState state,
+  ) => SectionCard(
+    icon: Icons.badge_outlined,
+    title: 'Taxpayer & EGS device',
+    description: 'Identifying info that goes into the certificate.',
+    child: Column(
+      children: [
+        _field(
+          _taxpayerName,
+          'Taxpayer name',
+          helper: 'Legal entity name as registered with ZATCA',
+          validator: (v) => Validators.required(v, label: 'Taxpayer name'),
+        ),
+        Gaps.hSm,
+        _field(
+          _vatNumber,
+          'VAT number',
+          helper: '15 digits, starts & ends with 3. Sandbox: 399999999900003',
+          validator: Validators.vatNumber,
+          keyboardType: TextInputType.number,
+        ),
+        Gaps.hSm,
+        _field(
+          _crn,
+          'Commercial registration number (CRN)',
+          helper: 'Any numeric string works for sandbox',
+          validator: (v) => Validators.required(v, label: 'CRN'),
+          keyboardType: TextInputType.number,
+        ),
+        Gaps.hMd,
+        const Subheading('Branch'),
+        Row(
           children: [
-            _field(
-              _taxpayerName,
-              'Taxpayer name',
-              helper: 'Legal entity name as registered with ZATCA',
-              validator: (v) =>
-                  Validators.required(v, label: 'Taxpayer name'),
+            Expanded(
+              child: _field(
+                _branchName,
+                'Branch name',
+                helper: 'Becomes the OU in the cert',
+                validator: (v) => Validators.required(v, label: 'Branch name'),
+              ),
             ),
-            Gaps.hSm,
-            _field(
-              _vatNumber,
-              'VAT number',
-              helper:
-                  '15 digits, starts & ends with 3. Sandbox: 399999999900003',
-              validator: Validators.vatNumber,
-              keyboardType: TextInputType.number,
-            ),
-            Gaps.hSm,
-            _field(
-              _crn,
-              'Commercial registration number (CRN)',
-              helper: 'Any numeric string works for sandbox',
-              validator: (v) => Validators.required(v, label: 'CRN'),
-              keyboardType: TextInputType.number,
-            ),
-            Gaps.hMd,
-            const Subheading('Branch'),
-            Row(
-              children: [
-                Expanded(
-                  child: _field(
-                    _branchName,
-                    'Branch name',
-                    helper: 'Becomes the OU in the cert',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Branch name'),
-                  ),
-                ),
-                Gaps.wSm,
-                Expanded(
-                  child: _field(
-                    _branchIndustry,
-                    'Branch industry',
-                    helper: 'e.g. Food, Retail',
-                    validator: (v) => Validators.required(
-                      v,
-                      label: 'Branch industry',
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Gaps.hMd,
-            const Subheading('Device'),
-            Row(
-              children: [
-                Expanded(
-                  child: _field(
-                    _taxpayerProvidedId,
-                    'EGS device ID',
-                    helper: 'Free text, e.g. POS-01',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Device ID'),
-                  ),
-                ),
-                Gaps.wSm,
-                Expanded(
-                  child: _field(
-                    _model,
-                    'Device model',
-                    helper: 'Free text, e.g. iOS, Android',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Model'),
-                  ),
-                ),
-              ],
+            Gaps.wSm,
+            Expanded(
+              child: _field(
+                _branchIndustry,
+                'Branch industry',
+                helper: 'e.g. Food, Retail',
+                validator:
+                    (v) => Validators.required(v, label: 'Branch industry'),
+              ),
             ),
           ],
         ),
-      );
+        Gaps.hMd,
+        const Subheading('Device'),
+        Row(
+          children: [
+            Expanded(
+              child: _field(
+                _taxpayerProvidedId,
+                'EGS device ID',
+                helper: 'Free text, e.g. POS-01',
+                validator: (v) => Validators.required(v, label: 'Device ID'),
+              ),
+            ),
+            Gaps.wSm,
+            Expanded(
+              child: _field(
+                _model,
+                'Device model',
+                helper: 'Free text, e.g. iOS, Android',
+                validator: (v) => Validators.required(v, label: 'Model'),
+              ),
+            ),
+          ],
+        ),
+      ],
+    ),
+  );
 
   Widget _addressSection(BuildContext context, OnboardingState state) =>
       SectionCard(
@@ -460,14 +455,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: _field(
                     _building,
                     'Building #',
-                    validator: (v) =>
-                        Validators.required(v, label: 'Building'),
+                    validator: (v) => Validators.required(v, label: 'Building'),
                   ),
                 ),
                 Gaps.wSm,
-                Expanded(
-                  child: _field(_plot, 'Plot ID (optional)'),
-                ),
+                Expanded(child: _field(_plot, 'Plot ID (optional)')),
               ],
             ),
             Gaps.hSm,
@@ -481,9 +473,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 ),
                 Gaps.wSm,
-                Expanded(
-                  child: _field(_citySubdivision, 'City subdivision'),
-                ),
+                Expanded(child: _field(_citySubdivision, 'City subdivision')),
               ],
             ),
             Gaps.hSm,
@@ -491,8 +481,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               _postalZone,
               'Postal zone',
               keyboardType: TextInputType.number,
-              validator: (v) =>
-                  Validators.required(v, label: 'Postal zone'),
+              validator: (v) => Validators.required(v, label: 'Postal zone'),
             ),
           ],
         ),
@@ -579,9 +568,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
       ],
       selected: {state.environment},
-      onSelectionChanged: (s) => context.read<OnboardingBloc>().add(
-        OnboardingEnvironmentChanged(s.first),
-      ),
+      onSelectionChanged:
+          (s) => context.read<OnboardingBloc>().add(
+            OnboardingEnvironmentChanged(s.first),
+          ),
     );
   }
 
@@ -612,10 +602,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: theme.colorScheme.onErrorContainer,
-          ),
+          Icon(Icons.error_outline, color: theme.colorScheme.onErrorContainer),
           Gaps.wSm,
           Expanded(
             child: Text(
@@ -638,25 +625,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         SizedBox(
           height: 52,
           child: FilledButton.icon(
-            onPressed: isSubmitting
-                ? null
-                : () {
-                    if (!_formKey.currentState!.validate()) return;
-                    context.read<OnboardingBloc>()
-                      ..add(OnboardingEgsChanged(_buildEgs(state)))
-                      ..add(OnboardingOtpChanged(_otp.text))
-                      ..add(const OnboardingSubmitted());
-                  },
-            icon: isSubmitting
-                ? const SizedBox(
-                    width: 18,
-                    height: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                : const Icon(Icons.verified_user),
+            onPressed:
+                isSubmitting
+                    ? null
+                    : () {
+                      if (!_formKey.currentState!.validate()) return;
+                      context.read<OnboardingBloc>()
+                        ..add(OnboardingEgsChanged(_buildEgs(state)))
+                        ..add(OnboardingOtpChanged(_otp.text))
+                        ..add(const OnboardingSubmitted());
+                    },
+            icon:
+                isSubmitting
+                    ? const SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                    : const Icon(Icons.verified_user),
             label: Text(
               state.hasComplianceCertificate
                   ? 'Re-issue compliance certificate'
@@ -671,15 +660,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           SizedBox(
             height: 48,
             child: OutlinedButton.icon(
-              onPressed: isSubmitting
-                  ? null
-                  : () => context.read<OnboardingBloc>().add(
-                      const OnboardingProductionUpgradeRequested(),
-                    ),
+              onPressed:
+                  isSubmitting
+                      ? null
+                      : () => context.read<OnboardingBloc>().add(
+                        const OnboardingProductionUpgradeRequested(),
+                      ),
               icon: const Icon(Icons.upgrade),
-              label: const Text(
-                'Upgrade to production certificate (optional)',
-              ),
+              label: const Text('Upgrade to production certificate (optional)'),
             ),
           ),
         ],
@@ -690,24 +678,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Future<void> _confirmReset(BuildContext context) async {
     final ok = await showDialog<bool>(
       context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('Reset onboarding?'),
-        content: const Text(
-          'This deletes the private key, certificate, and all saved progress '
-          '(including ICV counter and previous invoice hash). You\'ll need '
-          'a new OTP to request a new compliance certificate.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
+      builder:
+          (_) => AlertDialog(
+            title: const Text('Reset onboarding?'),
+            content: const Text(
+              'This deletes the private key, certificate, and all saved progress '
+              '(including ICV counter and previous invoice hash). You\'ll need '
+              'a new OTP to request a new compliance certificate.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancel'),
+              ),
+              FilledButton.tonal(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Reset'),
+              ),
+            ],
           ),
-          FilledButton.tonal(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Reset'),
-          ),
-        ],
-      ),
     );
     if (ok == true && context.mounted) {
       context.read<OnboardingBloc>().add(const OnboardingReset());

@@ -59,8 +59,7 @@ class OnboardingStepper extends StatelessWidget {
     if (state.status == OnboardingStatus.failure && _currentStep() == step) {
       return _StepStatus.failed;
     }
-    if (_currentStep() == step &&
-        state.status == OnboardingStatus.submitting) {
+    if (_currentStep() == step && state.status == OnboardingStatus.submitting) {
       return _StepStatus.active;
     }
     if (_currentStep() > step) return _StepStatus.done;
@@ -98,10 +97,7 @@ class OnboardingStepper extends StatelessWidget {
       _StepStatus.active => const SizedBox(
         width: 16,
         height: 16,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          color: Colors.white,
-        ),
+        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
       ),
       _StepStatus.failed => const Icon(Icons.close, color: Colors.white),
       _StepStatus.pending => Text(
@@ -134,9 +130,8 @@ class OnboardingStepper extends StatelessWidget {
                   title,
                   style: theme.textTheme.titleSmall?.copyWith(
                     fontWeight: FontWeight.w600,
-                    color: status == _StepStatus.pending
-                        ? theme.hintColor
-                        : null,
+                    color:
+                        status == _StepStatus.pending ? theme.hintColor : null,
                   ),
                 ),
                 Text(description, style: theme.textTheme.bodySmall),

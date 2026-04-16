@@ -29,8 +29,7 @@ class EnvironmentInfoCard extends StatelessWidget {
             purpose: 'Free, instant test — no registration.',
             otp: 'OTP: 123456 (fixed — works for any CSR)',
             vat: 'Invent any valid VAT: 15 digits starting & ending with 3',
-            link:
-                'https://sandbox.zatca.gov.sa/IntegrationSandbox',
+            link: 'https://sandbox.zatca.gov.sa/IntegrationSandbox',
             linkLabel: 'Developer Portal',
             isActive: environment == ZatcaEnvironment.sandbox,
           ),
@@ -72,9 +71,10 @@ class EnvironmentInfoCard extends StatelessWidget {
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton.icon(
-              onPressed: () => _open(
-                'https://zatca.gov.sa/en/E-Invoicing/Introduction/Guidelines/Pages/default.aspx',
-              ),
+              onPressed:
+                  () => _open(
+                    'https://zatca.gov.sa/en/E-Invoicing/Introduction/Guidelines/Pages/default.aspx',
+                  ),
               icon: const Icon(Icons.open_in_new, size: 16),
               label: const Text('ZATCA E-Invoicing Guidelines'),
             ),
@@ -100,9 +100,7 @@ class EnvironmentInfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         border: Border(
           left: BorderSide(
-            color: isActive
-                ? theme.colorScheme.primary
-                : Colors.transparent,
+            color: isActive ? theme.colorScheme.primary : Colors.transparent,
             width: 3,
           ),
         ),
@@ -159,8 +157,7 @@ class EnvironmentInfoCard extends StatelessWidget {
                   ),
                 ),
                 IconButton(
-                  onPressed: () =>
-                      Clipboard.setData(ClipboardData(text: link)),
+                  onPressed: () => Clipboard.setData(ClipboardData(text: link)),
                   icon: const Icon(Icons.copy, size: 14),
                   tooltip: 'Copy URL',
                   visualDensity: VisualDensity.compact,

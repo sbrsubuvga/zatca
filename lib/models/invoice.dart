@@ -137,9 +137,10 @@ class Invoice extends BaseInvoice {
       previousInvoiceHash: json['previousInvoiceHash'],
       invoiceType: InvoiceType.values[json['invoiceType']],
       actualDeliveryDate: json['actualDeliveryDate'],
-      paymentMethod: json['paymentMethod'] != null
-          ? ZATCAPaymentMethods.values[json['paymentMethod']]
-          : null,
+      paymentMethod:
+          json['paymentMethod'] != null
+              ? ZATCAPaymentMethods.values[json['paymentMethod']]
+              : null,
     );
   }
 

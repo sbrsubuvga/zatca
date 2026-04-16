@@ -52,8 +52,7 @@ class InvoiceLineDraft extends Equatable {
   double get taxPercentD => double.tryParse(taxPercent) ?? 0;
   double get discountAmountD => double.tryParse(discountAmount) ?? 0;
 
-  double get lineExtensionAmount =>
-      (quantityD * unitPriceD) - discountAmountD;
+  double get lineExtensionAmount => (quantityD * unitPriceD) - discountAmountD;
   double get lineTax => (lineExtensionAmount * taxPercentD) / 100;
   double get lineTotal => lineExtensionAmount + lineTax;
 

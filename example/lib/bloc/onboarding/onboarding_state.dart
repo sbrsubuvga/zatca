@@ -46,7 +46,8 @@ class OnboardingState extends Equatable {
   bool get hasProductionCertificate => productionCertPem != null;
 
   /// True once the device is onboarded enough to issue test invoices.
-  bool get isReadyToInvoice => hasComplianceCertificate && privateKeyPem != null;
+  bool get isReadyToInvoice =>
+      hasComplianceCertificate && privateKeyPem != null;
 
   OnboardingState copyWith({
     OnboardingStatus? status,

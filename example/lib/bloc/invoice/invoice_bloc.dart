@@ -200,28 +200,32 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
         sellerTRN: onboarding.egs!.vatNumber,
       );
 
-      final lines = state.lines
-          .map(
-            (d) => InvoiceLine(
-              id: d.id,
-              quantity: d.quantityD,
-              unitCode: d.unitCode,
-              lineExtensionAmount: d.quantityD * d.unitPriceD - d.discountAmountD,
-              itemName: d.itemName.isEmpty ? 'Item ${d.id}' : d.itemName,
-              taxPercent: d.taxPercentD,
-              discounts: d.discountAmountD > 0
-                  ? [
-                      Discount(
-                        amount: d.discountAmountD,
-                        reason: d.discountReason.isEmpty
-                            ? 'Discount'
-                            : d.discountReason,
-                      ),
-                    ]
-                  : const [],
-            ),
-          )
-          .toList();
+      final lines =
+          state.lines
+              .map(
+                (d) => InvoiceLine(
+                  id: d.id,
+                  quantity: d.quantityD,
+                  unitCode: d.unitCode,
+                  lineExtensionAmount:
+                      d.quantityD * d.unitPriceD - d.discountAmountD,
+                  itemName: d.itemName.isEmpty ? 'Item ${d.id}' : d.itemName,
+                  taxPercent: d.taxPercentD,
+                  discounts:
+                      d.discountAmountD > 0
+                          ? [
+                            Discount(
+                              amount: d.discountAmountD,
+                              reason:
+                                  d.discountReason.isEmpty
+                                      ? 'Discount'
+                                      : d.discountReason,
+                            ),
+                          ]
+                          : const [],
+                ),
+              )
+              .toList();
 
       final taxAmount = lines.fold<double>(0, (s, l) => s + l.taxAmount);
       final lineSubtotal = lines.fold<double>(
@@ -264,8 +268,7 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       final qrString = zatcaManager.getQrString(qrData);
       final ublXml = zatcaManager.generateUBLXml(
         invoiceHash: qrData.invoiceHash,
-        signingTime:
-            "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(now)}Z",
+        signingTime: "${DateFormat("yyyy-MM-dd'T'HH:mm:ss").format(now)}Z",
         digitalSignature: qrData.digitalSignature,
         invoiceXmlString: qrData.xmlString,
         qrString: qrString,
@@ -278,9 +281,10 @@ class InvoiceBloc extends Bloc<InvoiceEvent, InvoiceState> {
       );
 
       certificateManager.env = onboarding.environment;
-      final endpoint = state.kind.isStandard
-          ? 'Compliance check (B2B clearance)'
-          : 'Compliance check (B2C reporting)';
+      final endpoint =
+          state.kind.isStandard
+              ? 'Compliance check (B2B clearance)'
+              : 'Compliance check (B2C reporting)';
 
       await certificateManager.checkInvoiceCompliance(
         complianceCertificate: certificate,

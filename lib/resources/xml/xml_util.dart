@@ -377,8 +377,9 @@ class XmlUtil {
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
                     builder.text(
-                      (invoice.totalAmount - invoice.taxAmount)
-                          .toStringAsFixed(2),
+                      (invoice.totalAmount - invoice.taxAmount).toStringAsFixed(
+                        2,
+                      ),
                     );
                   },
                 );
@@ -803,7 +804,10 @@ class XmlUtil {
                                 );
                               },
                             );
-                            builder.element('ds:Object', nest: 'SIGNED_PROPERTIES_PLACEHOLDER');
+                            builder.element(
+                              'ds:Object',
+                              nest: 'SIGNED_PROPERTIES_PLACEHOLDER',
+                            );
                           },
                         );
                       },

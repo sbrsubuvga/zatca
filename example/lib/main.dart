@@ -24,14 +24,17 @@ class ZatcaExampleApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => OnboardingBloc(storage: storage)
-            ..add(const OnboardingLoadRequested()),
+          create:
+              (_) =>
+                  OnboardingBloc(storage: storage)
+                    ..add(const OnboardingLoadRequested()),
         ),
         BlocProvider(
-          create: (context) => InvoiceBloc(
-            onboardingBloc: context.read<OnboardingBloc>(),
-            storage: storage,
-          ),
+          create:
+              (context) => InvoiceBloc(
+                onboardingBloc: context.read<OnboardingBloc>(),
+                storage: storage,
+              ),
         ),
       ],
       child: MaterialApp(
@@ -63,9 +66,7 @@ class ZatcaExampleApp extends StatelessWidget {
         color: scheme.surface,
       ),
       inputDecorationTheme: InputDecorationTheme(
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
           borderSide: BorderSide(color: scheme.outlineVariant),
@@ -128,20 +129,21 @@ class _HomeShellState extends State<HomeShell> {
         return Scaffold(
           appBar: _AppHeader(state: state, showOnMobile: !useRail),
           body: useRail ? _railLayout(state) : _bottomNavLayout(state),
-          bottomNavigationBar: useRail
-              ? null
-              : NavigationBar(
-                  selectedIndex: _index,
-                  onDestinationSelected: (i) => setState(() => _index = i),
-                  destinations: [
-                    for (final d in _destinations)
-                      NavigationDestination(
-                        icon: Icon(d.icon),
-                        selectedIcon: Icon(d.activeIcon),
-                        label: d.label,
-                      ),
-                  ],
-                ),
+          bottomNavigationBar:
+              useRail
+                  ? null
+                  : NavigationBar(
+                    selectedIndex: _index,
+                    onDestinationSelected: (i) => setState(() => _index = i),
+                    destinations: [
+                      for (final d in _destinations)
+                        NavigationDestination(
+                          icon: Icon(d.icon),
+                          selectedIcon: Icon(d.activeIcon),
+                          label: d.label,
+                        ),
+                    ],
+                  ),
         );
       },
     );
@@ -159,9 +161,10 @@ class _HomeShellState extends State<HomeShell> {
             extended: Breakpoints.isExpanded(context),
             selectedIndex: _index,
             onDestinationSelected: (i) => setState(() => _index = i),
-            labelType: Breakpoints.isExpanded(context)
-                ? NavigationRailLabelType.none
-                : NavigationRailLabelType.all,
+            labelType:
+                Breakpoints.isExpanded(context)
+                    ? NavigationRailLabelType.none
+                    : NavigationRailLabelType.all,
             leading: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16),
               child: _AppMark(compact: !Breakpoints.isExpanded(context)),
@@ -233,10 +236,7 @@ class _AppMark extends StatelessWidget {
               fontWeight: FontWeight.bold,
             ),
           ),
-          Text(
-            'E-Invoicing demo',
-            style: theme.textTheme.bodySmall,
-          ),
+          Text('E-Invoicing demo', style: theme.textTheme.bodySmall),
         ],
       ),
     );
