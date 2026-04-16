@@ -4,10 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 import 'dart:convert';
 import 'package:zatca/resources/api/api.dart';
-import 'package:zatca/resources/cirtificate/templates/csr_template.dart';
+import 'package:zatca/resources/certificate/templates/csr_template.dart';
 
 import 'resources/enums.dart';
-import 'resources/cirtificate/certficate_util.dart';
+import 'resources/certificate/certificate_util.dart';
 import 'models/compliance_certificate.dart';
 
 /// The `CertificateManager` class is a singleton that manages the generation of key pairs, CSRs, and the issuance of compliance and production certificates.

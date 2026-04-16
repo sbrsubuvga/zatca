@@ -187,6 +187,7 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       "Accept-Language": "en",
+      "Content-Type": "application/json",
       "Clearance-Status": "0",
       ...authHeaders,
     };
@@ -217,6 +218,7 @@ ${utf8.decode(base64Decode(data["binarySecurityToken"]))}
     final headers = {
       "Accept-Version": API.settings["API_VERSION"]!,
       "Accept-Language": "en",
+      "Content-Type": "application/json",
       "Clearance-Status": "1",
       ...authHeaders,
     };

@@ -3,6 +3,7 @@ class Address {
   final String citySubdivision;
   final String street;
   final String building;
+  final String plotIdentification;
   final String postalZone;
   final String countryCode;
 
@@ -11,15 +12,17 @@ class Address {
     required this.citySubdivision,
     required this.street,
     required this.building,
+    String? plotIdentification,
     required this.postalZone,
     this.countryCode = "SA",
-  });
+  }) : plotIdentification = plotIdentification ?? building;
 
   /// Creates an [Address] instance from a [Map].
   factory Address.fromMap(Map<String, dynamic> map) {
     return Address(
       street: map['street'] ?? '',
       building: map['building'] ?? '',
+      plotIdentification: map['plotIdentification'],
       citySubdivision: map['citySubdivision'] ?? '',
       city: map['city'] ?? '',
       postalZone: map['postalZone'] ?? '',
@@ -32,6 +35,7 @@ class Address {
     return {
       'street': street,
       'building': building,
+      'plotIdentification': plotIdentification,
       'citySubdivision': citySubdivision,
       'city': city,
       'postalZone': postalZone,
@@ -41,8 +45,6 @@ class Address {
 }
 
 class Location extends Address {
-  final String plotIdentification;
-
   Location({
     required super.city,
     required super.citySubdivision,
@@ -50,8 +52,8 @@ class Location extends Address {
     required super.building,
     required super.postalZone,
     super.countryCode = "SA",
-    required this.plotIdentification,
-  });
+    required String plotIdentification,
+  }) : super(plotIdentification: plotIdentification);
 
   String get branchLocation {
     return '$building $street, $city';

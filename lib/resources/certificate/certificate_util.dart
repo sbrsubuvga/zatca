@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:asn1lib/asn1lib.dart';
 import 'package:crypto/crypto.dart';
-import '../../models/cirtificate_info.dart';
+import '../../models/certificate_info.dart';
 
 class CertificateUtil {
   /// Cleans the PEM certificate by removing header, footer, and line breaks.
@@ -17,10 +17,11 @@ class CertificateUtil {
 
   /// Extracts certificate information such as hash, issuer, serial number, public key, and signature.
   static CertificateInfo getCertificateInfo(String pem) {
-    /// Generate hash of the cleaned PEM content
+    /// Generate hash of the DER-encoded certificate
     final pemContent = cleanCertificatePem(pem);
-    final hash = sha256.convert(utf8.encode(pemContent)).toString();
-    final hashBase64Encoded = base64.encode(utf8.encode(hash));
+    final certDerBytes = base64.decode(pemContent);
+    final hashBytes = sha256.convert(certDerBytes).bytes;
+    final hashBase64Encoded = base64.encode(hashBytes);
 
     /// Decode the PEM content into bytes
     final bytes = _decodePem(pem);

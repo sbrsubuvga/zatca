@@ -60,7 +60,7 @@ void main() {
   });
   test('Initialize zatca', () async {
     final zatcaManager = ZatcaManager.instance;
-    zatcaManager.initializeZacta(
+    zatcaManager.initializeZatca(
       sellerName: egsUnitInfo.taxpayerName,
       sellerTRN: egsUnitInfo.vatNumber,
       supplier: Supplier(

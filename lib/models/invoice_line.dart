@@ -1,4 +1,4 @@
-import 'package:zatca/extesions/discount_list_extesions.dart';
+import 'package:zatca/extensions/discount_list_extensions.dart';
 
 import '../resources/enums.dart';
 

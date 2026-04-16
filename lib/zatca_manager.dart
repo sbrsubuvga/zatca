@@ -6,7 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/qr_data.dart';
-import 'package:zatca/resources/cirtificate/certficate_util.dart';
+import 'package:zatca/resources/certificate/certificate_util.dart';
 import 'package:zatca/resources/qr_generator.dart';
 import 'package:zatca/resources/signature/signature_util.dart';
 import 'package:zatca/resources/xml/xml_util.dart';
@@ -35,7 +35,7 @@ class ZatcaManager {
   /// [sellerTRN] - The Tax Registration Number (TRN) of the seller.
   /// [issuedCertificateBase64] - The issued certificate from zatca compliance.  only required for generating UBL standard XML
 
-  void initializeZacta({
+  void initializeZatca({
     required String privateKeyPem,
     required String certificatePem,
     required Supplier supplier,
@@ -169,7 +169,7 @@ class ZatcaManager {
       4: qrDataModel.invoiceData.totalAmount.toStringAsFixed(2),
       5: qrDataModel.invoiceData.taxAmount.toStringAsFixed(2),
       6: qrDataModel.invoiceHash,
-      7: utf8.encode(qrDataModel.digitalSignature),
+      7: qrDataModel.digitalSignature,
       8: base64.decode(qrDataModel.publicKey),
       9: base64.decode(qrDataModel.certificateSignature),
     };
@@ -224,11 +224,9 @@ class ZatcaManager {
     final signedPropertiesBytes = utf8.encode(
       defaultUBLExtensionsSignedPropertiesForSigningXMLString,
     );
-    final signedPropertiesHash =
-        sha256.convert(signedPropertiesBytes).toString();
-    final signedPropertiesHashBase64 = base64.encode(
-      utf8.encode(signedPropertiesHash),
-    );
+    final signedPropertiesHashBytes =
+        sha256.convert(signedPropertiesBytes).bytes;
+    final signedPropertiesHashBase64 = base64.encode(signedPropertiesHashBytes);
 
     final defaultUBLExtensionsSignedPropertiesXML =
         XmlUtil.defaultUBLExtensionsSignedProperties(
@@ -280,10 +278,10 @@ class ZatcaManager {
           '                            <xades:QualifyingProperties Target="signature" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#">',
           '<xades:QualifyingProperties Target="signature" xmlns:xades="http://uri.etsi.org/01903/v1.3.2#">',
         );
-    String replacable = """<ds:Object>
-                            $defaultUBLExtensionsSignedPropertiesXMLString
-                            </ds:Object>""";
-    xml = xml.replaceFirst('<ds:Object-1/>', replacable);
+    xml = xml.replaceFirst(
+      '<ds:Object>SIGNED_PROPERTIES_PLACEHOLDER</ds:Object>',
+      '<ds:Object>\n                            $defaultUBLExtensionsSignedPropertiesXMLString\n                            </ds:Object>',
+    );
 
     return xml;
   }

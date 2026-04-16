@@ -98,6 +98,9 @@ class Invoice extends BaseInvoice {
   /// The actual delivery date of the invoice in ISO 8601 format.
   final String actualDeliveryDate;
 
+  /// The payment method for the invoice.
+  final ZATCAPaymentMethods? paymentMethod;
+
   Invoice({
     required super.invoiceNumber,
     required super.uuid,
@@ -112,6 +115,7 @@ class Invoice extends BaseInvoice {
     required super.previousInvoiceHash,
     required super.invoiceType,
     required this.actualDeliveryDate,
+    this.paymentMethod,
   });
 
   factory Invoice.fromJson(Map<String, dynamic> json) {
@@ -133,6 +137,9 @@ class Invoice extends BaseInvoice {
       previousInvoiceHash: json['previousInvoiceHash'],
       invoiceType: InvoiceType.values[json['invoiceType']],
       actualDeliveryDate: json['actualDeliveryDate'],
+      paymentMethod: json['paymentMethod'] != null
+          ? ZATCAPaymentMethods.values[json['paymentMethod']]
+          : null,
     );
   }
 
@@ -140,6 +147,9 @@ class Invoice extends BaseInvoice {
   Map<String, dynamic> toJson() {
     final json = super.toJson();
     json['actualDeliveryDate'] = actualDeliveryDate;
+    if (paymentMethod != null) {
+      json['paymentMethod'] = paymentMethod!.index;
+    }
     return json;
   }
 }
@@ -158,6 +168,7 @@ class SimplifiedInvoice extends Invoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.actualDeliveryDate,
+    super.paymentMethod,
   }) : super(invoiceType: InvoiceType.simplifiedInvoice);
 
   factory SimplifiedInvoice.fromJson(Map<String, dynamic> json) {
@@ -203,6 +214,7 @@ class StandardInvoice extends Invoice {
     required super.totalAmount,
     required super.previousInvoiceHash,
     required super.actualDeliveryDate,
+    super.paymentMethod,
   }) : super(invoiceType: InvoiceType.standardInvoice);
 
   factory StandardInvoice.fromJson(Map<String, dynamic> json) {

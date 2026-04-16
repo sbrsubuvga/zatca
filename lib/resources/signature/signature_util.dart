@@ -35,7 +35,7 @@ class SignatureUtil {
 
       final privateKeyInt =
           (pkSeq.elements[1] as ASN1Integer).valueAsBigInteger;
-      final curve = ECCurve_secp256r1();
+      final curve = ECCurve_secp256k1();
       return ECPrivateKey(privateKeyInt, curve);
     } else if (topLevelSeq.elements.length == 4) {
       /// SEC1 format
@@ -45,7 +45,7 @@ class SignatureUtil {
         privateKeyBytes.map((e) => e.toRadixString(16).padLeft(2, '0')).join(),
         radix: 16,
       );
-      final curve = ECCurve_secp256r1();
+      final curve = ECCurve_secp256k1();
       return ECPrivateKey(privateKeyInt, curve);
     } else {
       throw ArgumentError('Invalid private key format');
@@ -111,7 +111,7 @@ class SignatureUtil {
         (sequence.elements[1] as ASN1OctetString).valueBytes();
     final privateKeyNum = BigInt.parse(hex.encode(privateKeyInt), radix: 16);
 
-    final domainParams = ECDomainParameters('secp256r1');
+    final domainParams = ECDomainParameters('secp256k1');
 
     return ECPrivateKey(privateKeyNum, domainParams);
   }

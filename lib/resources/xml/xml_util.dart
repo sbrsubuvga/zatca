@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
-import 'package:intl/intl.dart';
 import 'package:xml/xml.dart';
 import 'package:zatca/models/invoice.dart';
 import 'package:zatca/models/supplier.dart';
@@ -14,7 +13,6 @@ class XmlUtil {
     required int icv,
   }) {
     final builder = XmlBuilder();
-    final formatter = NumberFormat("#.##");
     builder.processing('xml', 'version="1.0" encoding="UTF-8"');
     builder.element(
       'Invoice',
@@ -237,7 +235,7 @@ class XmlUtil {
                       );
                       builder.element(
                         'cbc:PlotIdentification',
-                        nest: invoice.customer!.address.building,
+                        nest: invoice.customer!.address.plotIdentification,
                       );
                       builder.element(
                         'cbc:CitySubdivisionName',
@@ -332,6 +330,17 @@ class XmlUtil {
               );
             },
           );
+          if (invoice.paymentMethod != null) {
+            builder.element(
+              'cac:PaymentMeans',
+              nest: () {
+                builder.element(
+                  'cbc:PaymentMeansCode',
+                  nest: invoice.paymentMethod!.value,
+                );
+              },
+            );
+          }
         }
         if (invoice is DBInvoice) {
           builder.element(
@@ -368,7 +377,8 @@ class XmlUtil {
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
                     builder.text(
-                      formatter.format(invoice.totalAmount - invoice.taxAmount),
+                      (invoice.totalAmount - invoice.taxAmount)
+                          .toStringAsFixed(2),
                     );
                   },
                 );
@@ -376,7 +386,7 @@ class XmlUtil {
                   'cbc:TaxAmount',
                   nest: () {
                     builder.attribute('currencyID', 'SAR');
-                    builder.text(formatter.format(invoice.taxAmount));
+                    builder.text(invoice.taxAmount.toStringAsFixed(2));
                   },
                 );
                 builder.element(
@@ -438,7 +448,7 @@ class XmlUtil {
               'cbc:TaxExclusiveAmount',
               nest: () {
                 builder.attribute('currencyID', 'SAR');
-                builder.text(formatter.format(taxableAmount));
+                builder.text(taxableAmount.toStringAsFixed(2));
               },
             );
             builder.element(
@@ -515,7 +525,7 @@ class XmlUtil {
                       builder.element('cbc:ID', nest: 'S');
                       builder.element(
                         'cbc:Percent',
-                        nest: formatter.format(line.taxPercent),
+                        nest: line.taxPercent.toStringAsFixed(2),
                       );
                       builder.element(
                         'cac:TaxScheme',
@@ -536,7 +546,7 @@ class XmlUtil {
                       builder.attribute('currencyID', 'SAR');
                       builder.text(
                         line.taxExclusiveDiscountAppliedPrice.toStringAsFixed(
-                          14,
+                          2,
                         ),
                       );
                     },
@@ -555,7 +565,7 @@ class XmlUtil {
                             'cbc:Amount',
                             nest: () {
                               builder.attribute('currencyID', 'SAR');
-                              builder.text(discount.amount.toStringAsFixed(14));
+                              builder.text(discount.amount.toStringAsFixed(2));
                             },
                           );
 
@@ -793,7 +803,7 @@ class XmlUtil {
                                 );
                               },
                             );
-                            builder.element('ds:Object-1');
+                            builder.element('ds:Object', nest: 'SIGNED_PROPERTIES_PLACEHOLDER');
                           },
                         );
                       },
@@ -942,6 +952,10 @@ class XmlUtil {
                               'ds:DigestMethod',
                               nest: () {
                                 builder.attribute(
+                                  'xmlns:ds',
+                                  'http://www.w3.org/2000/09/xmldsig#',
+                                );
+                                builder.attribute(
                                   'Algorithm',
                                   'http://www.w3.org/2001/04/xmlenc#sha256',
                                 );
@@ -950,7 +964,13 @@ class XmlUtil {
                             );
                             builder.element(
                               'ds:DigestValue',
-                              nest: certificateHash,
+                              nest: () {
+                                builder.attribute(
+                                  'xmlns:ds',
+                                  'http://www.w3.org/2000/09/xmldsig#',
+                                );
+                                builder.text(certificateHash);
+                              },
                             );
                           },
                         );
@@ -960,11 +980,23 @@ class XmlUtil {
                           nest: () {
                             builder.element(
                               'ds:X509IssuerName',
-                              nest: certificateIssuer,
+                              nest: () {
+                                builder.attribute(
+                                  'xmlns:ds',
+                                  'http://www.w3.org/2000/09/xmldsig#',
+                                );
+                                builder.text(certificateIssuer);
+                              },
                             );
                             builder.element(
                               'ds:X509SerialNumber',
-                              nest: certificateSerialNumber,
+                              nest: () {
+                                builder.attribute(
+                                  'xmlns:ds',
+                                  'http://www.w3.org/2000/09/xmldsig#',
+                                );
+                                builder.text(certificateSerialNumber);
+                              },
                             );
                           },
                         );

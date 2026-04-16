@@ -277,7 +277,7 @@ class _HomeState extends State<Home> {
 
     /// Initialize the ZatcaManager singleton instance with seller and supplier details.
     final zatcaManager = ZatcaManager.instance;
-    zatcaManager.initializeZacta(
+    zatcaManager.initializeZatca(
       sellerName: egsUnitInfo.taxpayerName,
       sellerTRN: egsUnitInfo.vatNumber,
       supplier: Supplier(

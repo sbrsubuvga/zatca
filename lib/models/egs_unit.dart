@@ -1,4 +1,4 @@
-import '../resources/cirtificate/templates/csr_template.dart';
+import '../resources/certificate/templates/csr_template.dart';
 import '../resources/enums.dart';
 import 'address.dart';
 
