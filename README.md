@@ -20,6 +20,27 @@ For more insights, you can also read our Medium article: [Simplifying ZATCA E-In
 
 ---
 
+## What's new in 0.7.0
+
+- 🛠 **Correctness fix (critical):** ECDSA signing now uses `secp256k1`
+  (the curve ZATCA requires). Previous releases silently signed with
+  the wrong curve, producing signatures ZATCA would reject.
+- 🛠 **Correctness fix:** `SignedProperties` digest, certificate digest,
+  and decimal formatting in monetary fields all now match the ZATCA
+  specification.
+- ➕ Optional `paymentMethod` on regular invoices (not just credit/debit
+  notes) — emits `cac:PaymentMeans` in the XML.
+- 🧹 Breaking rename: `initializeZacta` → `initializeZatca`. A few
+  internal directory typos were fixed too (see the full
+  [CHANGELOG](CHANGELOG.md)).
+- 🎨 Rewritten example app (`example/`) with `flutter_bloc`, a guided
+  onboarding flow (keypair → CSR → compliance cert, with a one-tap
+  sandbox prefill and inline OTP/VAT guidance), and a result screen
+  that decodes the QR TLV tags for inspection. Responsive layout for
+  mobile, tablet, and desktop.
+
+---
+
 ## Features
 
 - ✅ Generate certificates for signing invoices (desktop only).
@@ -39,7 +60,7 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.6.6
+  zatca: ^0.7.0
 ```
 
 ## Platform Requirements
@@ -61,7 +82,7 @@ If you already have a certificate and private key generated elsewhere, you can *
 
 ```dart
 final zatcaManager = ZatcaManager.instance;
-zatcaManager.initializeZacta(
+zatcaManager.initializeZatca(
   sellerName: "Your Seller Name",
   sellerTRN: "Your TRN",
   supplier: supplier,
@@ -127,6 +148,33 @@ To disable the App Sandbox entitlement for macOS, ensure the following lines in 
 <true/> -->
 ```
 
-## Example App Screenshot
+## Example App
+
+A full reference integration lives in the [`example/`](example/) folder.
+It walks through the complete ZATCA lifecycle and is the fastest way to
+see the package in action.
+
+```bash
+cd example
+flutter run -d macos    # or -d linux / -d windows — CSR generation
+                        # needs a desktop target (OpenSSL dependency)
+```
+
+What it demonstrates:
+
+- **Onboarding flow** — generate a keypair, build a CSR, request a
+  compliance certificate, and optionally upgrade to a production
+  certificate. The form comes pre-loaded with known-good sandbox
+  values (OTP `123456`, a valid test VAT number) via a single button
+  so you can go from "installed" to "compliant" in a few taps.
+- **Invoice composition** — all six invoice variants (simplified &
+  standard, invoice / credit note / debit note), dynamic line items
+  with inline discounts, live totals, and ICV/PIH auto-chaining.
+- **Result screen** — scannable QR, TLV tag-by-tag breakdown,
+  copyable invoice hash, digital signature, and full signed UBL XML.
+
+State is managed with `flutter_bloc` and persisted via
+`shared_preferences` (swap for `flutter_secure_storage` in production
+— there's a note in `example/lib/data/storage.dart` explaining why).
 
 <img alt="Example App Screenshot" src="https://raw.githubusercontent.com/sbrsubuvga/zatca/refs/heads/main/assets/example_app.png" width="821" height="798" />
