@@ -1,22 +1,28 @@
-# ZATCA Package
+# ZATCA — Saudi Arabia E-Invoicing for Flutter
 
-The ZATCA package provides tools for generating and managing e-invoices compliant with the ZATCA (Zakat, Tax, and Customs Authority) regulations in Saudi Arabia. It includes features for creating QR codes, signing invoices, and handling invoice data models.
+> Generate ZATCA-compliant e-invoices, QR codes, and signed UBL XML
+> for both **Phase-1 (Generation)** and **Phase-2 (FATOORA Integration)**.
 
-For more information about ZATCA e-invoicing regulations, visit the [official ZATCA website](https://zatca.gov.sa/en/E-Invoicing/SystemsDevelopers/Pages/default.aspx).
-![ZATCA Fatoora Logo](https://zatca.gov.sa/ar/E-Invoicing/PublishingImages/header_logo.svg)
+<p align="center">
+  <img alt="ZATCA package — Phase-1 and Phase-2 e-invoicing for Flutter"
+       src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_1.png"
+       width="900" />
+</p>
 
-For more details, check out our Medium story: [Simplifying ZATCA E-Invoicing in Flutter with the ZATCA Package](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-with-the-zatca-package-9d181243c2a0).
+<p align="center">
+  <a href="https://pub.dev/packages/zatca"><img alt="pub.dev" src="https://img.shields.io/pub/v/zatca?label=pub.dev&color=0175C2"></a>
+  <a href="https://github.com/sbrsubuvga/zatca/blob/main/LICENSE"><img alt="license" src="https://img.shields.io/github/license/sbrsubuvga/zatca"></a>
+  <a href="https://github.com/sponsors/sbrsubuvga"><img alt="sponsor" src="https://img.shields.io/badge/Sponsor-%E2%9D%A4-ff69b4?logo=github-sponsors"></a>
+</p>
 
-For more insights, you can also read our Medium article: [Simplifying ZATCA E-Invoicing in Flutter with the ZATCA Package (in Flutter)](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-899b99df3511).
+The ZATCA package provides tools for generating and managing e-invoices
+compliant with the ZATCA (Zakat, Tax, and Customs Authority)
+regulations in Saudi Arabia. It includes features for creating QR
+codes, signing invoices, and handling invoice data models.
 
-
----
-
-<a href="https://github.com/sponsors/sbrsubuvga" target="_blank">
-  <img src="https://img.shields.io/badge/💖%20Sponsor%20on-GitHub%20Sponsors-blueviolet?style=for-the-badge&logo=github-sponsors" alt="Sponsor me on GitHub" />
-</a>
-
-> ☕ If you find this package helpful, consider sponsoring me to support continued development and maintenance.
+For background, visit the [official ZATCA website](https://zatca.gov.sa/en/E-Invoicing/SystemsDevelopers/Pages/default.aspx).
+Two Medium write-ups: [overview](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-with-the-zatca-package-9d181243c2a0)
+· [in-Flutter walkthrough](https://medium.com/@sbrsubuvga/simplifying-zatca-e-invoicing-in-flutter-899b99df3511).
 
 ---
 
@@ -238,30 +244,80 @@ To disable the App Sandbox entitlement for macOS, ensure the following lines in 
 ## Example App
 
 A full reference integration lives in the [`example/`](example/) folder.
-It walks through the complete ZATCA lifecycle and is the fastest way to
-see the package in action.
+It demonstrates **both phases side by side** and is the fastest way
+to see the package in action.
 
 ```bash
 cd example
-flutter run -d macos    # or -d linux / -d windows — CSR generation
-                        # needs a desktop target (OpenSSL dependency)
+flutter run -d macos    # or -d linux / -d windows — Phase-2 CSR
+                        # generation needs a desktop target
+                        # (OpenSSL dependency). Phase-1 runs anywhere.
 ```
+
+The app's side menu mirrors the package's structure: **PHASE-1
+(Generation)** has one screen (`SimpleZatcaManager`), **PHASE-2
+(Integration)** has two ordered steps (`ZatcaManager` onboarding +
+invoice). A landing screen explains the difference and links to the
+right flow.
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img alt="Phase-1 QR generator"
+           src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_2.png" width="420" />
+      <br/><sub><b>Phase-1</b> · <code>SimpleZatcaManager</code> — basic TLV QR (tags 1–5)</sub>
+    </td>
+    <td align="center" width="50%">
+      <img alt="Phase-2 signed invoice result"
+           src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_3.png" width="420" />
+      <br/><sub><b>Phase-2</b> · <code>ZatcaManager</code> — signed UBL + 9-tag QR</sub>
+    </td>
+  </tr>
+</table>
 
 What it demonstrates:
 
-- **Onboarding flow** — generate a keypair, build a CSR, request a
-  compliance certificate, and optionally upgrade to a production
-  certificate. The form comes pre-loaded with known-good sandbox
-  values (OTP `123456`, a valid test VAT number) via a single button
-  so you can go from "installed" to "compliant" in a few taps.
-- **Invoice composition** — all six invoice variants (simplified &
-  standard, invoice / credit note / debit note), dynamic line items
-  with inline discounts, live totals, and ICV/PIH auto-chaining.
-- **Result screen** — scannable QR, TLV tag-by-tag breakdown,
+- **Phase-1 QR Generator** — `SimpleZatcaManager` end-to-end: form →
+  TLV QR → tag-by-tag breakdown. Same QR works for B2C and B2B.
+- **Phase-2 Onboarding** — generate a keypair, build a CSR, request
+  a compliance certificate, and optionally upgrade to a production
+  certificate. Pre-loaded with known-good sandbox values (OTP
+  `123456`, a valid test VAT number) via a single button.
+- **Phase-2 Invoice composition** — all six invoice variants
+  (simplified & standard, invoice / credit note / debit note),
+  dynamic line items with inline discounts, live totals, and
+  ICV/PIH auto-chaining. Locked in the side menu until onboarding
+  completes.
+- **Phase-2 Result screen** — scannable QR, TLV tag-by-tag breakdown,
   copyable invoice hash, digital signature, and full signed UBL XML.
 
 State is managed with `flutter_bloc` and persisted via
 `shared_preferences` (swap for `flutter_secure_storage` in production
 — there's a note in `example/lib/data/storage.dart` explaining why).
 
-<img alt="Example App Screenshot" src="https://raw.githubusercontent.com/sbrsubuvga/zatca/refs/heads/main/assets/example_app.png" width="821" height="798" />
+---
+
+## ❤️ Support this package
+
+`zatca` is maintained as a free, open-source library. ZATCA's spec
+changes regularly and keeping the package compliant takes ongoing
+work — if it's saving your team time on a paid project, please
+consider sponsoring its maintenance.
+
+<p>
+  <a href="https://github.com/sponsors/sbrsubuvga">
+    <img alt="Sponsor on GitHub Sponsors"
+         src="https://img.shields.io/badge/Sponsor%20on-GitHub%20Sponsors-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white" />
+  </a>
+</p>
+
+Other ways to help, even without money:
+
+- ⭐ **Star** the [GitHub repo](https://github.com/sbrsubuvga/zatca) —
+  visibility is what brings new contributors.
+- 🐛 **File issues** when ZATCA rejects an invoice — paste the error,
+  the redacted XML, and the package version.
+- 📝 **Share** the Medium articles or write your own — every "I shipped
+  ZATCA in Flutter using this package" post helps another team start.
+- 🔌 **Submit PRs** — the [`example/`](example/) app is a good way to
+  contribute new flows without touching the core library.
