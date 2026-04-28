@@ -20,6 +20,93 @@ For more insights, you can also read our Medium article: [Simplifying ZATCA E-In
 
 ---
 
+## What's new in 0.8.0
+
+- ➕ **ZATCA Phase-1 (Generation) support** via a new dedicated class,
+  `SimpleZatcaManager`. Merchants not yet onboarded to FATOORA can now
+  produce a compliant basic TLV QR (tags 1–5) for both simplified
+  (B2C) and standard (B2B) invoices — no certificates, no signing,
+  no ZATCA API calls required.
+- 🧭 **Two purpose-built classes:** `ZatcaManager` for Phase-2
+  (FATOORA Integration, unchanged) and `SimpleZatcaManager` for
+  Phase-1 (Generation). Pick the one that matches the merchant.
+  No phase enums, no runtime guards — the type system enforces it.
+- ♻️ **Zero breaking changes** for existing Phase-2 consumers — the
+  `ZatcaManager` API is identical to 0.7.0.
+- 🧪 New unit tests covering TLV encoding, amount formatting, UTF-8
+  (Arabic) seller names, VAT validation, and B2B/B2C QR equivalence.
+- 🎨 Example app now has a dedicated "Phase-1 QR" screen.
+
+See [Choosing your phase](#choosing-your-phase) below.
+
+---
+
+## Choosing your phase
+
+ZATCA e-invoicing has two phases. **One terminal / merchant account
+runs in exactly one phase at a time.** Pick the manager that matches
+the tenant you are integrating for:
+
+| | Phase-1 (Generation) | Phase-2 (Integration) |
+|---|---|---|
+| When | Merchant **not yet onboarded** to FATOORA | Merchant **onboarded** with compliance + production CSID |
+| Manager class | `SimpleZatcaManager` | `ZatcaManager` |
+| QR code | Basic TLV, tags 1–5 | Full TLV, tags 1–9 |
+| Signing | ❌ None | ✅ ECDSA secp256k1 |
+| Certificates | ❌ Not required | ✅ Compliance + production CSID |
+| ZATCA API | ❌ None | ✅ Reporting / clearance |
+| B2B vs B2C | Same basic QR for both | UBL XML differs; QR structure shared |
+
+### Phase-1 example (`SimpleZatcaManager`)
+
+```dart
+import 'package:zatca/simple_zatca_manager.dart';
+
+SimpleZatcaManager.instance.initialize(
+  sellerName: 'My Shop',
+  sellerTRN: '300000000000003',
+);
+
+final qr = SimpleZatcaManager.instance.generateQrString(
+  issueDateTime: DateTime.now(),
+  totalWithVat: 115.00,
+  vatTotal: 15.00,
+);
+// Render `qr` with any QR widget (e.g. `qr_flutter`'s QrImageView).
+```
+
+That's it for Phase-1 — no onboarding, no keys, no network calls.
+Same call works for both simplified (B2C) and standard (B2B) invoices.
+
+### Phase-2 example (`ZatcaManager`)
+
+```dart
+import 'package:zatca/zatca_manager.dart';
+
+ZatcaManager.instance.initializeZatca(
+  privateKeyPem: privateKeyPem,
+  certificatePem: certificatePem,
+  supplier: supplier,
+  sellerName: 'My Shop',
+  sellerTRN: '300000000000003',
+);
+
+final qrData = ZatcaManager.instance.generateZatcaQrInit(
+  invoice: invoice,
+  icv: icv,
+);
+final qr = ZatcaManager.instance.getQrString(qrData);
+final signedXml = ZatcaManager.instance.generateUBLXml(
+  invoiceHash: qrData.invoiceHash,
+  signingTime: signingTime,
+  digitalSignature: qrData.digitalSignature,
+  invoiceXmlString: qrData.xmlString,
+  qrString: qr,
+);
+```
+
+---
+
 ## What's new in 0.7.0
 
 - 🛠 **Correctness fix (critical):** ECDSA signing now uses `secp256k1`
@@ -60,7 +147,7 @@ To use this package, add it to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  zatca: ^0.7.0
+  zatca: ^0.8.0
 ```
 
 ## Platform Requirements

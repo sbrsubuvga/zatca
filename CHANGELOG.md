@@ -1,5 +1,65 @@
 # Changelog
 
+## 0.8.0
+
+Adds ZATCA **Phase-1 (Generation)** support via a new dedicated class,
+so a single integration of this package can serve both onboarded
+(Phase-2) and not-yet-onboarded (Phase-1) merchants. **Fully backward
+compatible** — existing `ZatcaManager` Phase-2 code is unchanged.
+
+### Added
+
+* **`SimpleZatcaManager`** — a new singleton for ZATCA Phase-1
+  (Generation). Takes only `sellerName` and `sellerTRN` — no private
+  key, no certificate, no supplier info, no ZATCA API. Produces a
+  compliant basic TLV QR (tags 1–5) that is identical for both
+  simplified (B2C) and standard (B2B) invoices.
+
+  ```dart
+  import 'package:zatca/simple_zatca_manager.dart';
+
+  SimpleZatcaManager.instance.initialize(
+    sellerName: 'My Shop',
+    sellerTRN: '300000000000003',
+  );
+
+  final qr = SimpleZatcaManager.instance.generateQrString(
+    issueDateTime: DateTime.now(),
+    totalWithVat: 115.00,
+    vatTotal: 15.00,
+  );
+  ```
+
+  A convenience wrapper `generateQrStringFromInvoice(BaseInvoice)`
+  is also provided for integrators who already have a `BaseInvoice`.
+* **Input validation.** `sellerTRN` must be 15 digits starting and
+  ending with `3`. Amounts must be finite and non-negative, and VAT
+  cannot exceed the invoice total.
+* **Example app** has a dedicated **Phase-1 QR** screen that
+  demonstrates `SimpleZatcaManager` end-to-end (form → TLV QR →
+  tag-by-tag breakdown).
+* **Unit tests** (`test/phase1_qr_test.dart`) covering TLV tag order
+  and lengths, two-decimal amount formatting, UTF-8 (Arabic) seller
+  names, VAT-format validation, negative-amount rejection, and
+  B2B/B2C QR equivalence.
+
+### Architecture
+
+Phase-1 and Phase-2 are now exposed as **two purpose-built singletons**
+rather than one manager with a runtime phase flag. Pick the class that
+matches the merchant — the type system enforces phase separation.
+
+| Phase | Class | Use when |
+|---|---|---|
+| Phase-1 (Generation) | `SimpleZatcaManager` | Merchant not yet onboarded to FATOORA |
+| Phase-2 (Integration) | `ZatcaManager` | Merchant onboarded with compliance + production CSID |
+
+### Unchanged
+
+* `ZatcaManager` — public API and behavior identical to 0.7.0.
+* `CertificateManager` — public API and behavior identical to 0.7.0
+  (it remains a Phase-2 helper; Phase-1 callers simply don't use it).
+
 ## 0.7.0
 
 A major correctness release that fixes several bugs that were silently

@@ -8,6 +8,7 @@ import 'package:zatca/resources/enums.dart';
 import '../bloc/onboarding/onboarding_bloc.dart';
 import '../bloc/onboarding/onboarding_event.dart';
 import '../bloc/onboarding/onboarding_state.dart';
+import '../data/sandbox_defaults.dart';
 import '../ui/breakpoints.dart';
 import '../ui/section_card.dart';
 import '../util/validators.dart';
@@ -69,6 +70,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   void _hydrate(OnboardingState state) {
     final egs = state.egs;
     if (egs == null) return;
+    _writeFormFields(egs);
+    if (_otp.text.isEmpty) _otp.text = state.otp;
+  }
+
+  /// Writes [egs] into every form controller. Used by both the bloc-driven
+  /// hydrate path and the synchronous "Fill with sandbox data" button.
+  void _writeFormFields(EGSUnitInfo egs) {
     _taxpayerName.text = egs.taxpayerName;
     _vatNumber.text = egs.vatNumber;
     _crn.text = egs.crnNumber;
@@ -82,7 +90,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _city.text = egs.location.city;
     _citySubdivision.text = egs.location.citySubdivision;
     _postalZone.text = egs.location.postalZone;
-    if (_otp.text.isEmpty) _otp.text = state.otp;
   }
 
   EGSUnitInfo _buildEgs(OnboardingState state) => EGSUnitInfo(
@@ -266,10 +273,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     FilledButton.tonalIcon(
                       onPressed: () {
+                        // Reset the form synchronously. We can't rely on the
+                        // BlocConsumer listener for this — its `listenWhen`
+                        // filters out emissions where prev/curr have the
+                        // same sandbox VAT and OTP, which is exactly what
+                        // happens when the user prefills a second time.
+                        _writeFormFields(SandboxDefaults.egsUnitInfo());
+                        _otp.text = SandboxDefaults.otp;
+                        _prefilled = true;
                         context.read<OnboardingBloc>().add(
                           const OnboardingPrefilledWithSandboxData(),
                         );
-                        _prefilled = false;
                       },
                       icon: const Icon(Icons.bolt, size: 18),
                       label: const Text('Fill with sandbox data'),

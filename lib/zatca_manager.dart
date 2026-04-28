@@ -13,7 +13,15 @@ import 'package:zatca/resources/xml/xml_util.dart';
 
 import 'models/supplier.dart';
 
-/// A singleton class that manages the generation of ZATCA-compliant invoices and QR codes.
+/// Manager for **ZATCA Phase-2 (FATOORA Integration)** invoicing.
+///
+/// Use this for merchants onboarded to FATOORA with compliance and
+/// production CSIDs. It produces signed UBL 2.1 XML, the full
+/// 9-tag TLV QR code, and integrates with ZATCA reporting / clearance
+/// APIs (via [CertificateManager]).
+///
+/// For merchants **not yet onboarded** to FATOORA, use
+/// [SimpleZatcaManager] (Phase-1) instead.
 class ZatcaManager {
   ZatcaManager._();
 

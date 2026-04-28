@@ -10,7 +10,12 @@ import 'resources/enums.dart';
 import 'resources/certificate/certificate_util.dart';
 import 'models/compliance_certificate.dart';
 
-/// The `CertificateManager` class is a singleton that manages the generation of key pairs, CSRs, and the issuance of compliance and production certificates.
+/// The `CertificateManager` class is a singleton that manages the generation
+/// of key pairs, CSRs, and the issuance of compliance and production
+/// certificates.
+///
+/// This is a **Phase-2 (FATOORA Integration)** helper. Phase-1 merchants
+/// (see [SimpleZatcaManager]) do not need any of the methods on this class.
 class CertificateManager {
   ZatcaEnvironment env = ZatcaEnvironment.sandbox;
   CertificateManager._();
