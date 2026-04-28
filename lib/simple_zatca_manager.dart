@@ -42,10 +42,7 @@ class SimpleZatcaManager {
   /// [sellerName] - Merchant / taxpayer name as registered with ZATCA.
   /// [sellerTRN] - 15-digit VAT registration number; must start and
   /// end with `3`.
-  void initialize({
-    required String sellerName,
-    required String sellerTRN,
-  }) {
+  void initialize({required String sellerName, required String sellerTRN}) {
     _validateSellerName(sellerName);
     _validateSellerTRN(sellerTRN);
     _sellerName = sellerName.trim();

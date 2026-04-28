@@ -215,9 +215,7 @@ class _PhaseCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(
-                      child: Text(b, style: theme.textTheme.bodySmall),
-                    ),
+                    Expanded(child: Text(b, style: theme.textTheme.bodySmall)),
                   ],
                 ),
               ),

@@ -104,8 +104,8 @@ void main() {
         previousInvoiceHash: '',
       );
 
-      final fromInvoice =
-          SimpleZatcaManager.instance.generateQrStringFromInvoice(invoice);
+      final fromInvoice = SimpleZatcaManager.instance
+          .generateQrStringFromInvoice(invoice);
       final tlv = _decodeTlv(base64.decode(fromInvoice));
 
       expect(utf8.decode(tlv[3]!), '2024-03-02T09:15:45');
@@ -158,10 +158,12 @@ void main() {
         previousInvoiceHash: '',
       );
 
-      final qrB2c =
-          SimpleZatcaManager.instance.generateQrStringFromInvoice(b2c);
-      final qrB2b =
-          SimpleZatcaManager.instance.generateQrStringFromInvoice(b2b);
+      final qrB2c = SimpleZatcaManager.instance.generateQrStringFromInvoice(
+        b2c,
+      );
+      final qrB2b = SimpleZatcaManager.instance.generateQrStringFromInvoice(
+        b2b,
+      );
 
       expect(qrB2c, qrB2b);
     });

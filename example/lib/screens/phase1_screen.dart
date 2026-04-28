@@ -100,13 +100,17 @@ class _Phase1ScreenState extends State<Phase1Screen> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.info_outline,
-                              color: theme.colorScheme.primary),
+                          Icon(
+                            Icons.info_outline,
+                            color: theme.colorScheme.primary,
+                          ),
                           const SizedBox(width: 8),
-                          Text('SimpleZatcaManager',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontFamily: 'monospace',
-                              )),
+                          Text(
+                            'SimpleZatcaManager',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 8),
@@ -130,10 +134,13 @@ class _Phase1ScreenState extends State<Phase1Screen> {
                         TextFormField(
                           controller: _sellerName,
                           decoration: const InputDecoration(
-                              labelText: 'Seller name'),
-                          validator: (v) => (v == null || v.trim().isEmpty)
-                              ? 'Required'
-                              : null,
+                            labelText: 'Seller name',
+                          ),
+                          validator:
+                              (v) =>
+                                  (v == null || v.trim().isEmpty)
+                                      ? 'Required'
+                                      : null,
                         ),
                         const SizedBox(height: 12),
                         TextFormField(
@@ -141,21 +148,24 @@ class _Phase1ScreenState extends State<Phase1Screen> {
                           decoration: const InputDecoration(
                             labelText: 'VAT registration number (15 digits)',
                           ),
-                          validator: (v) =>
-                              RegExp(r'^3\d{13}3$').hasMatch(v ?? '')
-                                  ? null
-                                  : '15 digits, starts & ends with 3',
+                          validator:
+                              (v) =>
+                                  RegExp(r'^3\d{13}3$').hasMatch(v ?? '')
+                                      ? null
+                                      : '15 digits, starts & ends with 3',
                         ),
                         const SizedBox(height: 12),
                         InputDecorator(
-                          decoration:
-                              const InputDecoration(labelText: 'Issue date/time'),
+                          decoration: const InputDecoration(
+                            labelText: 'Issue date/time',
+                          ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
-                                  DateFormat("yyyy-MM-dd'T'HH:mm:ss")
-                                      .format(_issueDateTime),
+                                  DateFormat(
+                                    "yyyy-MM-dd'T'HH:mm:ss",
+                                  ).format(_issueDateTime),
                                 ),
                               ),
                               TextButton.icon(
@@ -173,9 +183,12 @@ class _Phase1ScreenState extends State<Phase1Screen> {
                               child: TextFormField(
                                 controller: _total,
                                 decoration: const InputDecoration(
-                                    labelText: 'Total (with VAT)'),
-                                keyboardType: const TextInputType
-                                    .numberWithOptions(decimal: true),
+                                  labelText: 'Total (with VAT)',
+                                ),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 validator: _numberValidator,
                               ),
                             ),
@@ -184,9 +197,12 @@ class _Phase1ScreenState extends State<Phase1Screen> {
                               child: TextFormField(
                                 controller: _vat,
                                 decoration: const InputDecoration(
-                                    labelText: 'VAT total'),
-                                keyboardType: const TextInputType
-                                    .numberWithOptions(decimal: true),
+                                  labelText: 'VAT total',
+                                ),
+                                keyboardType:
+                                    const TextInputType.numberWithOptions(
+                                      decimal: true,
+                                    ),
                                 validator: _numberValidator,
                               ),
                             ),
@@ -212,7 +228,8 @@ class _Phase1ScreenState extends State<Phase1Screen> {
                     child: Text(
                       _error!,
                       style: TextStyle(
-                          color: theme.colorScheme.onErrorContainer),
+                        color: theme.colorScheme.onErrorContainer,
+                      ),
                     ),
                   ),
                 ),
@@ -291,13 +308,13 @@ class _TlvBreakdown extends StatelessWidget {
   }
 
   static String _tagLabel(int tag) => switch (tag) {
-        1 => 'Seller name',
-        2 => 'VAT number',
-        3 => 'Timestamp',
-        4 => 'Invoice total',
-        5 => 'VAT total',
-        _ => 'Unknown',
-      };
+    1 => 'Seller name',
+    2 => 'VAT number',
+    3 => 'Timestamp',
+    4 => 'Invoice total',
+    5 => 'VAT total',
+    _ => 'Unknown',
+  };
 
   static List<(int, String)> _decode(String base64Qr) {
     try {
@@ -307,7 +324,10 @@ class _TlvBreakdown extends StatelessWidget {
       while (i < bytes.length) {
         final tag = bytes[i++];
         final len = bytes[i++];
-        final val = utf8.decode(bytes.sublist(i, i + len), allowMalformed: true);
+        final val = utf8.decode(
+          bytes.sublist(i, i + len),
+          allowMalformed: true,
+        );
         out.add((tag, val));
         i += len;
       }
