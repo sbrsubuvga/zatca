@@ -264,12 +264,12 @@ right flow.
   <tr>
     <td align="center" width="50%">
       <img alt="Phase-1 QR generator"
-           src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_2.png" width="420" />
+           src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_3.png" width="420" />
       <br/><sub><b>Phase-1</b> · <code>SimpleZatcaManager</code> — basic TLV QR (tags 1–5)</sub>
     </td>
     <td align="center" width="50%">
       <img alt="Phase-2 signed invoice result"
-           src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_3.png" width="420" />
+           src="https://raw.githubusercontent.com/sbrsubuvga/zatca/main/assets/example_app_2.png" width="420" />
       <br/><sub><b>Phase-2</b> · <code>ZatcaManager</code> — signed UBL + 9-tag QR</sub>
     </td>
   </tr>
