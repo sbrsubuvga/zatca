@@ -1,6 +1,6 @@
 name: zatca
 description: "A Flutter package for generating ZATCA (Saudi Arabia's Zakat, Tax and Customs Authority) compliant invoice XML and QR codes."
-version: 0.8.0
+version: 0.8.1
 homepage: https://github.com/sbrsubuvga/zatca.git
 repository: https://github.com/sbrsubuvga/zatca.git
 issue_tracker: https://github.com/sbrsubuvga/zatca/issues
@@ -43,3 +43,9 @@ topics:
   - einvoice
   - fatoora
   - phase2
+
+# The EC private key in the digest-encoding test is a throwaway fixture, generated
+# only to sign a sample invoice offline so the XAdES digest encodings can be
+# asserted. It guards nothing and is paired with a self-signed fixture certificate.
+false_secrets:
+  - /test/digest_encoding_test.dart

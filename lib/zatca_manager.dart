@@ -232,9 +232,16 @@ class ZatcaManager {
     final signedPropertiesBytes = utf8.encode(
       defaultUBLExtensionsSignedPropertiesForSigningXMLString,
     );
-    final signedPropertiesHashBytes =
-        sha256.convert(signedPropertiesBytes).bytes;
-    final signedPropertiesHashBase64 = base64.encode(signedPropertiesHashBytes);
+    // Same encoding rule as the certificate hash: SHA-256 as a lowercase hex
+    // string, then Base64 of that hex string (88 characters). Base64 of the raw
+    // digest (44 characters) makes ZATCA reject the invoice with
+    // "signed-properties-hashing: Invalid signed properties hashing".
+    // Note this differs from the invoice hash, which IS Base64 of the raw digest.
+    final signedPropertiesHashHex =
+        sha256.convert(signedPropertiesBytes).toString();
+    final signedPropertiesHashBase64 = base64.encode(
+      utf8.encode(signedPropertiesHashHex),
+    );
 
     final defaultUBLExtensionsSignedPropertiesXML =
         XmlUtil.defaultUBLExtensionsSignedProperties(

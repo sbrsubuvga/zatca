@@ -17,11 +17,19 @@ class CertificateUtil {
 
   /// Extracts certificate information such as hash, issuer, serial number, public key, and signature.
   static CertificateInfo getCertificateInfo(String pem) {
-    /// Generate hash of the DER-encoded certificate
+    /// Generate the ZATCA certificate hash.
+    ///
+    /// ZATCA hashes the certificate's Base64 *text* - not its decoded DER bytes -
+    /// then takes the SHA-256 as a lowercase hex string and Base64-encodes that
+    /// hex string, yielding an 88-character value. See the E-Invoice Security
+    /// Features Implementation Standards, 1.6.2.1.1.2.
+    ///
+    /// Hashing the DER bytes, or Base64-encoding the raw digest (44 characters),
+    /// makes ZATCA reject every invoice with
+    /// "certificate-hashing: Invalid certificate hashing".
     final pemContent = cleanCertificatePem(pem);
-    final certDerBytes = base64.decode(pemContent);
-    final hashBytes = sha256.convert(certDerBytes).bytes;
-    final hashBase64Encoded = base64.encode(hashBytes);
+    final hashHex = sha256.convert(utf8.encode(pemContent)).toString();
+    final hashBase64Encoded = base64.encode(utf8.encode(hashHex));
 
     /// Decode the PEM content into bytes
     final bytes = _decodePem(pem);

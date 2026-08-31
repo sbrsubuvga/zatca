@@ -1,5 +1,46 @@
 # Changelog
 
+## 0.8.1
+
+**Critical fix — every signed invoice produced by 0.7.0 and 0.8.0 is rejected
+by ZATCA.** Upgrade immediately if you are on either version.
+
+### Fixed
+
+* **Certificate hash (`xades:CertDigest`) encoding.** ZATCA hashes the
+  certificate's Base64 *text* and expects Base64 of the SHA-256 **hex string**
+  (88 characters). 0.8.0 hashed the decoded DER bytes and Base64-encoded the
+  raw digest (44 characters), so the gateway rejected every invoice with:
+
+  ```
+  certificate-hashing: Invalid certificate hashing
+  ```
+
+* **SignedProperties hash (`ds:Reference URI="#xadesSignedProperties"`)
+  encoding.** Same rule — Base64 of the SHA-256 hex string, not of the raw
+  digest. 0.7.0 and 0.8.0 emitted the raw form, producing:
+
+  ```
+  signed-properties-hashing: Invalid signed properties hashing,
+  SignedProperties with id='xadesSignedProperties'
+  ```
+
+  The invoice hash (`ds:Reference Id="invoiceSignedData"`) is unaffected — it
+  *is* Base64 of the raw digest, and was already correct.
+
+Both digests match 0.6.6 again. No public API changed, so upgrading from
+0.7.x/0.8.0 needs no code changes.
+
+**If you shipped 0.7.0 or 0.8.0:** invoices already signed by those builds
+cannot be reported as-is — the stored XML carries the bad digests. They have to
+be re-signed after upgrading.
+
+### Added
+
+* `test/digest_encoding_test.dart` — offline regression tests pinning all three
+  digest encodings (88 / 88 / 44 characters) against a fixture certificate, so
+  this cannot silently regress again.
+
 ## 0.8.0
 
 Adds ZATCA **Phase-1 (Generation)** support via a new dedicated class,
